@@ -1,0 +1,69 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* You can add global styles to this file, and also import other style files */
+
+html {
+  --fd-background: 227 40% 5%;
+  --fd-foreground: 0 0% 94%;
+  --fd-muted: 0 0% 12.9%;
+  --fd-muted-foreground: 0 0% 60.9%;
+  --fd-popover: 0 0% 7%;
+  --fd-popover-foreground: 0 0% 88%;
+  --fd-card: 0 0% 6.0%;
+  --fd-card-foreground: 0 0% 98%;
+  --fd-border: 0 0% 18%;
+  --fd-primary: 0 0% 98%;
+  --fd-primary-foreground: 0 0% 9%;
+  --fd-secondary: 0 0% 12.9%;
+  --fd-secondary-foreground: 0 0% 98%;
+  --fd-accent: 0 0% 12.9%;
+  --fd-accent-foreground: 0 0% 98%;
+  --fd-ring: 0 0% 14.9%;
+
+  line-height: 1.5;
+  -webkit-text-size-adjust: 100%;
+  -moz-tab-size: 4;
+  -o-tab-size: 4;
+  tab-size: 4;
+  font-feature-settings: normal;
+  font-variation-settings: normal;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  background-color: hsl(var(--fd-background) / 1);
+  color: hsl(var(--fd-foreground) / 1);
+}
+
+main {
+  background-color: hsl(var(--fd-background) / 1);
+}
+
+footer {
+  background-color: hsl(var(--fd-background) / 1);
+}
+
+.border-fd-foreground\/10 {
+  border-color: hsl(var(--fd-foreground) / .1);
+}
+
+.bg-fd-background\/60 {
+  background-color: hsl(var(--fd-background) / .6);
+}
+
+.bg-fd-background\/20 {
+  background-color: hsl(var(--fd-background) / .2);
+}
+
+.text-fd-muted-foreground {
+  --tw-text-opacity: 1;
+  color: hsl(var(--fd-muted-foreground) / var(--tw-text-opacity));
+}
+
+.transition-colors {
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
+  transition-timing-function: cubic-bezier(.4,0,.2,1);
+  transition-duration: .15s;
+}

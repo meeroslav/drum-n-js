@@ -1,0 +1,54 @@
+<header class="sticky top-0 z-50 border-b transition-colors border-fd-foreground/10 border-opacity-20 bg-fd-background/60 backdrop-blur-md h-14">
+  <nav class="mx-auto flex size-full max-w-container flex-row items-center gap-6 px-4">
+    <a class="inline-flex items-center gap-2 font-semibold" href="/">
+      <div class="my-auto flex flex-row items-center justify-center">
+        <div class="relative block">
+          NG
+        </div>
+        <svg class="ml-1 mr-1 text-[#eaeaea] dark:text-[#333]" data-testid="geist-icon" fill="none" height="24" shape-rendering="geometricPrecision" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" viewBox="0 0 24 24">
+          <path d="M16.88 3.549L7.12 20.451"></path>
+        </svg>
+        <div class="hover:opacity-75">
+          309
+        </div>
+        <svg class="ml-1 mr-1 text-[#eaeaea] dark:text-[#333]" data-testid="geist-icon" fill="none" height="24" shape-rendering="geometricPrecision" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" viewBox="0 0 24 24">
+          <path d="M16.88 3.549L7.12 20.451"></path>
+        </svg>
+      </div>
+    </a>
+    <a
+      class="-m-2 inline-flex items-center gap-1 p-2 transition-colors text-sm"
+      [routerLink]="['/loop']"
+      routerLinkActive="text-fd-primary">Loop</a>
+    <a
+      class="-m-2 inline-flex items-center gap-1 p-2 text-fd-muted-foreground transition-colors hover:text-fd-accent-foreground text-sm"
+      [routerLink]="['/loop-with-effects']">Loop with effects</a>
+
+    <div class="flex flex-1 flex-row items-center justify-end md:gap-2">
+      NG-BE 2024
+    </div>
+  </nav>
+</header>
+<main class="mx-auto mt-8 flex w-full min-w-0 max-w-6xl flex-col gap-4 px-6 pt-4 md:px-12">
+  <section class="w-screen-lg mx-auto mb-16 w-full pb-8 pt-4">
+    <app-nx-welcome></app-nx-welcome>
+    <router-outlet></router-outlet>
+  </section>
+</main>
+<footer class="relative pb-[env(safe-area-inset-bottom)]">
+  <div class="pointer-events-none absolute top-0 h-12 w-full -translate-y-full bg-gradient-to-t from-[#FAFAFA] to-transparent dark:from-black"></div>
+  <div class="mx-auto flex max-w-[90rem] gap-2 px-4 py-2 hidden"></div>
+  <hr class="dark:border-neutral-800">
+  <div class="mx-auto flex max-w-[90rem] justify-center py-12 text-black dark:text-white md:justify-center pl-[max(env(safe-area-inset-left),1.5rem)] pr-[max(env(safe-area-inset-right),1.5rem)]">
+    <div aria-labelledby="footer-heading" class="w-full">
+      <h2 class="sr-only" id="footer-heading">Footer</h2>
+      <div class="mx-auto w-full py-8">
+        <div class="mt-8 pt-8 sm:flex sm:items-center sm:justify-between">
+          <div>
+            <p class="mt-4 text-xs text-gray-500 dark:text-[#888888]">© <!-- -->2024<!-- --> Miroslav Jonas</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>

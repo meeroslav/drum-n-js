@@ -1,0 +1,24 @@
+{
+  "compileOnSave": false,
+  "compilerOptions": {
+    "rootDir": ".",
+    "sourceMap": true,
+    "declaration": false,
+    "moduleResolution": "node",
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "importHelpers": true,
+    "target": "es2015",
+    "module": "esnext",
+    "lib": ["es2020", "dom"],
+    "skipLibCheck": true,
+    "skipDefaultLibCheck": true,
+    "baseUrl": ".",
+    "paths": {
+      "@drum-n-js/audio-utils": ["libs/audio-utils/src/index.ts"],
+      "@drum-n-js/loop": ["libs/loop/src/index.ts"],
+      "tslib": ["node_modules/tslib/tslib.d.ts"]
+    }
+  },
+  "exclude": ["node_modules", "tmp"]
+}

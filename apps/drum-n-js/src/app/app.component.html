@@ -17,12 +17,18 @@
       </div>
     </a>
     <a
-      class="-m-2 inline-flex items-center gap-1 p-2 transition-colors text-sm"
+      class="-m-2 inline-flex items-center gap-1 p-2 transition-colors text-fd-muted-foreground hover:text-fd-muted-foregroun text-sm"
       [routerLink]="['/loop']"
-      routerLinkActive="text-fd-primary">Loop</a>
+      routerLinkActive="text-fd-active">Loop</a>
     <a
-      class="-m-2 inline-flex items-center gap-1 p-2 text-fd-muted-foreground transition-colors hover:text-fd-accent-foreground text-sm"
-      [routerLink]="['/loop-with-effects']">Loop with effects</a>
+      class="-m-2 inline-flex items-center gap-1 p-2 transition-colors text-fd-muted-foreground hover:text-fd-muted-foreground text-sm"
+      [routerLink]="['/loop-with-effects']"
+      routerLinkActive="text-fd-active">Adding effects</a>
+
+      <a
+      class="-m-2 inline-flex items-center gap-1 p-2 transition-colors text-fd-muted-foreground hover:text-fd-muted-foreground text-sm"
+      [routerLink]="['/loop-with-visualizer']"
+      routerLinkActive="text-fd-active">Adding visualizer</a>
 
     <div class="flex flex-1 flex-row items-center justify-end md:gap-2">
       NG-BE 2024

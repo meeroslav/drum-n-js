@@ -2213,6 +2213,7 @@ __metadata:
     "@typescript-eslint/utils": "npm:^8.0.0"
     angular-eslint: "npm:^18.3.0"
     autoprefixer: "npm:^10.4.0"
+    domino: "npm:^2.1.6"
     esbuild: "npm:^0.19.2"
     eslint: "npm:^9.8.0"
     eslint-config-prettier: "npm:^9.0.0"
@@ -8147,6 +8148,13 @@ __metadata:
   dependencies:
     domelementtype: "npm:^2.3.0"
   checksum: 10c0/bba1e5932b3e196ad6862286d76adc89a0dbf0c773e5ced1eb01f9af930c50093a084eff14b8de5ea60b895c56a04d5de8bbc4930c5543d029091916770b2d2a
+  languageName: node
+  linkType: hard
+
+"domino@npm:^2.1.6":
+  version: 2.1.6
+  resolution: "domino@npm:2.1.6"
+  checksum: 10c0/18afc4b61cf9bc2bfdbb48782748484319eb78c07d98ee6ab5850c2ed8e8d617ecf48ea2b34543d66d639ae33104ab4d2c79a316480805b66c5f537f38f75862
   languageName: node
   linkType: hard
 

@@ -17,6 +17,7 @@
     "paths": {
       "@drum-n-js/audio-utils": ["libs/audio-utils/src/index.ts"],
       "@drum-n-js/loop": ["libs/loop/src/index.ts"],
+      "@drum-n-js/loop-with-effects": ["loop-with-effects/src/index.ts"],
       "tslib": ["node_modules/tslib/tslib.d.ts"]
     }
   },

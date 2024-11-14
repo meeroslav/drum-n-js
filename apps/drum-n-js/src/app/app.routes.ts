@@ -8,7 +8,7 @@ export const appRoutes: Route[] = [
   },
   {
     path: 'loop-with-effects',
-    loadComponent: () => import('@drum-n-js/loop').then(c => c.LoopComponent),
+    loadComponent: () => import('@drum-n-js/loop-with-effects').then(c => c.LoopWithEffectsComponent),
     title: 'Loop with effects',
   },
   { path: '', redirectTo: '/loop', pathMatch: 'full' }

@@ -2210,6 +2210,7 @@ __metadata:
     "@types/express": "npm:4.17.14"
     "@types/jest": "npm:^29.5.12"
     "@types/node": "npm:18.16.9"
+    "@types/tunajs": "npm:^1.0.3"
     "@typescript-eslint/utils": "npm:^8.0.0"
     angular-eslint: "npm:^18.3.0"
     autoprefixer: "npm:^10.4.0"
@@ -2229,6 +2230,7 @@ __metadata:
     ts-jest: "npm:^29.1.0"
     ts-node: "npm:10.9.1"
     tslib: "npm:^2.3.0"
+    tunajs: "npm:^1.0.15"
     typescript: "npm:~5.5.2"
     typescript-eslint: "npm:^8.0.0"
     zone.js: "npm:~0.14.3"
@@ -5823,6 +5825,13 @@ __metadata:
   version: 4.0.5
   resolution: "@types/tough-cookie@npm:4.0.5"
   checksum: 10c0/68c6921721a3dcb40451543db2174a145ef915bc8bcbe7ad4e59194a0238e776e782b896c7a59f4b93ac6acefca9161fccb31d1ce3b3445cb6faa467297fb473
+  languageName: node
+  linkType: hard
+
+"@types/tunajs@npm:^1.0.3":
+  version: 1.0.3
+  resolution: "@types/tunajs@npm:1.0.3"
+  checksum: 10c0/c1436d0e1956760daefc5059fc461b2ec7e749db36ccffc4bd655c157bc8620064993812ecebd7713afdce7d2d72de0980e47c1c36fe039a95edad7696dae9bb
   languageName: node
   linkType: hard
 
@@ -15631,6 +15640,13 @@ __metadata:
     debug: "npm:^4.3.4"
     make-fetch-happen: "npm:^13.0.1"
   checksum: 10c0/7c17b097571f001730d7be0aeaec6bec46ed2f25bf73990b1133c383d511a1ce65f831e5d6d78770940a85b67664576ff0e4c98e5421bab6d33ff36e4be500c8
+  languageName: node
+  linkType: hard
+
+"tunajs@npm:^1.0.15":
+  version: 1.0.15
+  resolution: "tunajs@npm:1.0.15"
+  checksum: 10c0/743bb89fa2594b0069836f70dfa264a344f1a76802274894e9c1d8a0562c33639989b5c13cddcb221769a1a45c426321a376c1cdff0aa71a908cad8cf31d5573
   languageName: node
   linkType: hard
 

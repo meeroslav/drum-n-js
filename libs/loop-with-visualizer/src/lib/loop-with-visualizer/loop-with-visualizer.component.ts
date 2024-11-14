@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ElementRef, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
@@ -7,30 +7,23 @@ import { FormsModule } from '@angular/forms';
   standalone: true,
   imports: [CommonModule, FormsModule],
   template: `
-    <h2 class="text-4xl font-extrabold mb-4">Loop with Visualizer</h2>
+    <h2 class="text-4xl font-extrabold mb-4">Analyzer</h2>
     <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" (click)="togglePlay()">
       {{ isPlaying ? 'Stop' : 'Play' }}
     </button>
-    <input class="ml-2 mr-2"
-      [ngModel]="lowPassFrequency"
-      (ngModelChange)="setLowPassFrequency($event)"
-      id="customRange1" type="range" min="40" [max]="lowPassMax" />
-    <input class="ml-2 mr-2"
-      [ngModel]="masterGain"
-      (ngModelChange)="setMasterGain($event)"
-      id="customRange1" type="range" min="0" max="1" step="0.01" />
+    <canvas class="mt-2" #canvas width="800" height="200"></canvas>
   `,
 })
 export class LoopWithVisualizerComponent {
+  @ViewChild('canvas') canvas!: ElementRef;
+
   ctx!: AudioContext;
   master!: GainNode;
   source!: AudioBufferSourceNode;
+  analyzer!: AnalyserNode;
   audioBuffer!: AudioBuffer;
-  lowPassFilter!: BiquadFilterNode;
+  drawHandle!: number;
   isPlaying = false;
-  lowPassFrequency = 2000;
-  lowPassMax = 20000;
-  masterGain = 0.8;
 
   constructor() {
     const AudioContext = getAudioContext();
@@ -38,15 +31,12 @@ export class LoopWithVisualizerComponent {
       this.ctx = new AudioContext();
       // create nodes
       this.master = this.ctx.createGain();
-      this.master.gain.value = this.masterGain;
-      this.lowPassFilter = this.ctx.createBiquadFilter();
-      this.lowPassFilter.type = 'lowpass';
-      this.lowPassMax = this.ctx.sampleRate / 2;
-      this.lowPassFrequency = this.lowPassMax;
-      this.lowPassFilter.frequency.value = this.lowPassFrequency;
+      this.analyzer = this.ctx.createAnalyser();
+      // configure nodes
+      this.analyzer.fftSize = 64;
       // connect sources
-      this.master.connect(this.lowPassFilter);
-      this.lowPassFilter.connect(this.ctx.destination);
+      this.master.connect(this.analyzer);
+      this.analyzer.connect(this.ctx.destination);
       // fetch audio
       fetchAndDecodeAudio('loop.wav', this.ctx).then(audioBuffer => {
         this.audioBuffer = audioBuffer;
@@ -58,23 +48,55 @@ export class LoopWithVisualizerComponent {
     this.stopSource();
   }
 
-  setLowPassFrequency(frequency: number) {
-    this.lowPassFilter.frequency.value = frequency;
-  }
-
-  setMasterGain(volume: number) {
-    this.master.gain.value = volume;
-  }
-
   createSourceAndPlay() {
     this.source = this.ctx.createBufferSource();
     this.source.buffer = this.audioBuffer;
     this.source.connect(this.master);
     this.source.start(0);
+    this.drawVisualizer();
   }
 
   stopSource() {
-    this.source && this.source.stop();
+    if (this.source) {
+      this.source.stop();
+    }
+    if (this.drawHandle) {
+      cancelAnimationFrame(this.drawHandle);
+    }
+  }
+
+  drawVisualizer() {
+    const canvas = this.canvas.nativeElement;
+    const canvasCtx = canvas.getContext('2d');
+    const bufferLength = this.analyzer.frequencyBinCount;
+    const dataArray = new Uint8Array(bufferLength);
+    canvasCtx.clearRect(0, 0, canvas.width, canvas.height);
+
+    const draw = () => {
+      this.drawHandle = requestAnimationFrame(draw);
+
+      // clean canvas
+      canvasCtx.fillStyle = "rgb(8, 10, 18)";
+      canvasCtx.fillRect(0, 0, 800, 200);
+
+      canvasCtx.lineWidth = 2;
+      canvasCtx.strokeStyle = "rgb(0, 0, 0)";
+      const barWidth = (800 / bufferLength);
+      let barHeight;
+      let x = 0;
+      // get data
+      this.analyzer.getByteFrequencyData(dataArray);
+      for (let i = 0; i < bufferLength; i++) {
+        barHeight = dataArray[i];
+
+        canvasCtx.fillStyle = `rgb(30 46 ${barHeight})`;
+        canvasCtx.fillRect(800 - x, 200 - barHeight / 1.5, barWidth, barHeight);
+
+        x += barWidth + 1;
+      }
+    };
+
+    draw();
   }
 
   togglePlay() {

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -12,7 +12,7 @@ import { CommonModule } from '@angular/common';
     </button>
   `,
 })
-export class LoopComponent {
+export class LoopComponent implements OnDestroy {
   ctx!: AudioContext;
   source!: AudioBufferSourceNode;
   audioBuffer!: AudioBuffer;
@@ -28,7 +28,7 @@ export class LoopComponent {
     }
   }
 
-  onDestroy() {
+  ngOnDestroy() {
     this.stopSource();
   }
 

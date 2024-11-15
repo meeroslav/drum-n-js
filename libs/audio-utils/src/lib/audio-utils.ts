@@ -65,6 +65,8 @@ export const createEcho = (context: AudioContext, time = 0, volume = 0): EchoNod
   delayGain.connect(output);
   delayGain.connect(delay);
 
+  // input -> delay -> delayGain -> output, input -> output -> delayGain -> delay
+
   const setTime = (newTime: number) => {
     delay.delayTime.value = newTime;
   };

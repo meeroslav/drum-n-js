@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
@@ -9,19 +9,39 @@ import { FormsModule } from '@angular/forms';
   template: `
     <h2 class="text-4xl font-extrabold mb-4">Effects</h2>
     <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" (click)="togglePlay()">
-      {{ isPlaying ? 'Stop' : 'Play' }}
+        {{ isPlaying ? 'Stop' : 'Play' }}
     </button>
-    <input class="ml-2 mr-2"
-      [ngModel]="lowPassFrequency"
-      (ngModelChange)="setLowPassFrequency($event)"
-      id="customRange1" type="range" min="40" [max]="lowPassMax" />
-    <input class="ml-2 mr-2"
-      [ngModel]="masterGain"
-      (ngModelChange)="setMasterGain($event)"
-      id="customRange1" type="range" min="0" max="1" step="0.01" />
+    <h3 class="text-xl font-bold mt-4 mb-2">Low Pass Filter</h3>
+    <div class="flex flex-row border rounded p-2">
+      <div class="basis-1/4 ml-2">
+        <label for="lowPassFrequency">Cut off Frequency</label>
+        <input
+          [ngModel]="lowPassFrequency"
+          (ngModelChange)="setLowPassFrequency($event)"
+          type="range" min="40" [max]="lowPassMax" />
+      </div>
+      <div class="basis-1/4 ml-2">
+        <label for="lowPassQuality">Resonance</label>
+        <input
+          [ngModel]="lowPassQuality"
+          (ngModelChange)="setLowPassQuality($event)"
+          type="range" min="0.0001" max="20" step="0.0001" />
+      </div>
+    </div>
+    <h3 class="text-xl font-bold mt-4 mb-2">Volume</h3>
+    <div class="flex flex-row border rounded p-2">
+      <div class="basis-1/4 ml-2">
+        <label for="masterGain">Volume</label>
+        <input class="w-full"
+          [ngModel]="masterGain"
+          (ngModelChange)="setMasterGain($event)"
+          type="range" min="0" max="1" step="0.01" />
+      </div>
+    </div>
+
   `,
 })
-export class LoopWithEffectsComponent {
+export class LoopWithEffectsComponent implements OnDestroy {
   ctx!: AudioContext;
   master!: GainNode;
   source!: AudioBufferSourceNode;
@@ -29,6 +49,7 @@ export class LoopWithEffectsComponent {
   lowPassFilter!: BiquadFilterNode;
   isPlaying = false;
   lowPassFrequency = 2000;
+  lowPassQuality = 1;
   lowPassMax = 20000;
   masterGain = 0.8;
 
@@ -39,11 +60,13 @@ export class LoopWithEffectsComponent {
       // create nodes
       this.master = this.ctx.createGain();
       this.master.gain.value = this.masterGain;
+      // low pass filter
       this.lowPassFilter = this.ctx.createBiquadFilter();
       this.lowPassFilter.type = 'lowpass';
       this.lowPassMax = this.ctx.sampleRate / 2;
       this.lowPassFrequency = this.lowPassMax;
       this.lowPassFilter.frequency.value = this.lowPassFrequency;
+      this.lowPassFilter.Q.value = this.lowPassQuality;
       // connect sources
       this.master.connect(this.lowPassFilter);
       this.lowPassFilter.connect(this.ctx.destination);
@@ -54,12 +77,16 @@ export class LoopWithEffectsComponent {
     }
   }
 
-  onDestroy() {
+  ngOnDestroy() {
     this.stopSource();
   }
 
   setLowPassFrequency(frequency: number) {
     this.lowPassFilter.frequency.value = frequency;
+  }
+
+  setLowPassQuality(quality: number) {
+    this.lowPassFilter.Q.value = quality;
   }
 
   setMasterGain(volume: number) {
@@ -74,6 +101,7 @@ export class LoopWithEffectsComponent {
   }
 
   stopSource() {
+    console.log('Stopping source');
     if (this.source) {
       this.source.stop();
     }

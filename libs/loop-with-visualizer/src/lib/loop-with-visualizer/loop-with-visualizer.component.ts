@@ -1,4 +1,4 @@
-import { Component, ElementRef, ViewChild } from '@angular/core';
+import { Component, ElementRef, ViewChild, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
@@ -14,7 +14,7 @@ import { FormsModule } from '@angular/forms';
     <canvas class="mt-2" #canvas width="800" height="200"></canvas>
   `,
 })
-export class LoopWithVisualizerComponent {
+export class LoopWithVisualizerComponent implements OnDestroy {
   @ViewChild('canvas') canvas!: ElementRef;
 
   ctx!: AudioContext;
@@ -44,7 +44,7 @@ export class LoopWithVisualizerComponent {
     }
   }
 
-  onDestroy() {
+  ngOnDestroy() {
     this.stopSource();
   }
 

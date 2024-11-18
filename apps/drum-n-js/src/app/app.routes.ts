@@ -21,5 +21,10 @@ export const appRoutes: Route[] = [
     loadComponent: () => import('@drum-n-js/oscillator').then(c => c.OscillatorComponent),
     title: 'Oscillator',
   },
+  {
+    path: 'groovebox',
+    loadComponent: () => import('@drum-n-js/groovebox').then(c => c.GrooveboxComponent),
+    title: 'Groovebox',
+  },
   { path: '', redirectTo: '/loop', pathMatch: 'full' }
 ];

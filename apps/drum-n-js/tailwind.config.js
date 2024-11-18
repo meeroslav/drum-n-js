@@ -9,7 +9,12 @@ module.exports = {
     ...createGlobPatternsForDependencies(__dirname),
   ],
   theme: {
-    extend: {},
+    extend: {
+      colors: {
+        'dark-blue': 'rgb(16, 20, 36)',
+        'light-blue': 'rgb(37, 48, 91)',
+      },
+    }
   },
   safelist: [
     'bg-slate-300',

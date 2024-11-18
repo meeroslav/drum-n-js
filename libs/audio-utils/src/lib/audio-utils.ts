@@ -53,49 +53,49 @@ export interface EchoNode extends AudioNode {
   volume: AudioParam;
 }
 
-export const createEcho = (context: AudioContext, time = 0, volume = 0): EchoNode => {
-  const input = context.createGain();
-  const output = context.createGain();
-  const delay = context.createDelay();
-  const delayGain = context.createGain();
-  // connect sources
-  input.connect(output);
-  input.connect(delay);
-  delay.connect(delayGain);
-  delayGain.connect(output);
-  delayGain.connect(delay);
+// export const createEcho = (context: AudioContext, time = 0, volume = 0): EchoNode => {
+//   const input = context.createGain();
+//   const output = context.createGain();
+//   const delay = context.createDelay();
+//   const delayGain = context.createGain();
+//   // connect sources
+//   input.connect(output);
+//   input.connect(delay);
+//   delay.connect(delayGain);
+//   delayGain.connect(output);
+//   delayGain.connect(delay);
 
-  // input -> delay -> delayGain -> output, input -> output -> delayGain -> delay
+//   // input -> delay -> delayGain -> output, input -> output -> delayGain -> delay
 
-  const setTime = (newTime: number) => {
-    delay.delayTime.value = newTime;
-  };
+//   const setTime = (newTime: number) => {
+//     delay.delayTime.value = newTime;
+//   };
 
-  const setVolume = (newVolume: number) => {
-    delayGain.gain.value = newVolume;
-  };
+//   const setVolume = (newVolume: number) => {
+//     delayGain.gain.value = newVolume;
+//   };
 
-  setTime(time);
-  setVolume(volume);
+//   setTime(time);
+//   setVolume(volume);
 
-  Object.defineProperty(input, 'time', {
-    get: () => delay.delayTime,
-  });
+//   Object.defineProperty(input, 'time', {
+//     get: () => delay.delayTime,
+//   });
 
-  Object.defineProperty(input, 'volume', {
-    get: () => delayGain.gain,
-  });
+//   Object.defineProperty(input, 'volume', {
+//     get: () => delayGain.gain,
+//   });
 
-  input.connect = (destination: AudioParam | AudioNode) => {
-    if (destination instanceof AudioNode) {
-      output.connect(destination);
-      return destination;
-    }
-    return output;
-  };
+//   input.connect = (destination: AudioParam | AudioNode) => {
+//     if (destination instanceof AudioNode) {
+//       output.connect(destination);
+//       return destination;
+//     }
+//     return output;
+//   };
 
-  return (input as any) as EchoNode;
-};
+//   return (input as any) as EchoNode;
+// };
 
 export const setDelayTime = (echo: EchoNode, time: number) => {
   echo.time.value = time;

@@ -17,6 +17,7 @@
     "baseUrl": ".",
     "paths": {
       "@drum-n-js/audio-utils": ["libs/audio-utils/src/index.ts"],
+      "@drum-n-js/groovebox": ["libs/groovebox/src/index.ts"],
       "@drum-n-js/loop": ["libs/loop/src/index.ts"],
       "@drum-n-js/loop-with-effects": ["libs/loop-with-effects/src/index.ts"],
       "@drum-n-js/loop-with-visualizer": [

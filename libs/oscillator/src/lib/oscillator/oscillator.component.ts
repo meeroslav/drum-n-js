@@ -1,4 +1,4 @@
-import { Component, effect, ElementRef, HostListener, signal, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, ElementRef, HostListener, signal, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import Tuna from 'tunajs';
 import { FormsModule } from '@angular/forms';
@@ -6,6 +6,7 @@ import { FormsModule } from '@angular/forms';
 @Component({
   selector: 'lib-oscillator',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule, FormsModule],
   template: `
   <h2 class="text-4xl font-extrabold mb-4">Oscillators</h2>

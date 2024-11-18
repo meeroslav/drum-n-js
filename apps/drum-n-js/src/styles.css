@@ -49,12 +49,20 @@ footer {
   border-color: hsl(var(--fd-foreground) / .1);
 }
 
+.border-fd-foreground\/30 {
+  border-color: hsl(var(--fd-foreground) / .3);
+}
+
 .bg-fd-background\/60 {
   background-color: hsl(var(--fd-background) / .6);
 }
 
 .bg-fd-background\/20 {
   background-color: hsl(var(--fd-background) / .2);
+}
+
+.bg-fd-background\/30 {
+  background-color: hsl(var(--fd-background) / .3);
 }
 
 .text-fd-muted-foreground {
@@ -74,4 +82,8 @@ footer {
   transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
   transition-timing-function: cubic-bezier(.4,0,.2,1);
   transition-duration: .15s;
+}
+
+.grid-cols-16	{
+  grid-template-columns: repeat(16, minmax(0, 1fr));
 }

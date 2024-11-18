@@ -11,5 +11,9 @@ module.exports = {
   theme: {
     extend: {},
   },
+  safelist: [
+    'bg-slate-300',
+    'bg-slate-700',
+  ],
   plugins: [],
 };

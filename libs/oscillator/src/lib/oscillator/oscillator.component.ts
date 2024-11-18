@@ -1,8 +1,7 @@
-import { Component, ElementRef, HostListener, ViewChild } from '@angular/core';
+import { Component, effect, ElementRef, HostListener, signal, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import Tuna from 'tunajs';
 import { FormsModule } from '@angular/forms';
-import e from 'express';
 
 @Component({
   selector: 'lib-oscillator',
@@ -27,7 +26,7 @@ import e from 'express';
   <h3 class="text-xl font-bold mt-4 mb-2">Envelope</h3>
   <div class="flex flex-row border rounded border-fd-foreground/10 border-opacity-20 p-2">
     <div class="basis-1/2 ml-2">
-      <canvas #canvas width="200" height="100"></canvas>
+      <canvas #envCanvas width="400" height="150"></canvas>
     </div>
     <div class="basis-1/4 ml-2">
       <div>
@@ -35,7 +34,7 @@ import e from 'express';
           class="mr-2"
           id="attack"
           [(ngModel)]="envAttack"
-          type="range" min="0" max="5" step="0.01" />
+          type="range" min="0" max="2" step="0.01" />
           <label for="attact">Attack</label>
       </div>
       <div>
@@ -43,7 +42,7 @@ import e from 'express';
           class="mr-2"
           id="decay"
           [(ngModel)]="envDecay"
-          type="range" min="0" max="5" step="0.01" />
+          type="range" min="0" max="2" step="0.01" />
           <label for="decay">Decay</label>
       </div>
       <div>
@@ -59,7 +58,7 @@ import e from 'express';
           class="mr-2"
           id="release"
           [(ngModel)]="envRelease"
-          type="range" min="0" max="5" step="0.01" />
+          type="range" min="0" max="2" step="0.01" />
           <label for="release">Release</label>
       </div>
     </div>
@@ -79,25 +78,31 @@ import e from 'express';
       <label for="osc3" class="ml-2">Moog Ladder</label>
     </div>
   </div>
-  <h3 class="mt-4">{{ selectedNote || 'Press any key to play note' }}</h3>
+  <div class="flex flex-row mt-4">
+    <div class="basis-1/11 rounded border border-black"
+    *ngFor="let note of selectedNotes; let i = index"
+    [ngClass]="[1, 3, 6, 8, 10].includes(i % 12) ?
+      (note ? 'bg-slate-700 h-24 w-8 -ml-4 -mr-4 z-10 shadow-xl' : 'bg-black h-24 w-8 -ml-4 -mr-4 z-10 shadow-xl') :
+      (note ? 'bg-slate-300 h-32 w-12 shadow-inner' : 'bg-white h-32 w-12 shadow-inner')">
+    </div>
+  </div>
   `
 })
 export class OscillatorComponent {
-  @ViewChild('canvas') canvas!: ElementRef;
+  @ViewChild('envCanvas') canvas!: ElementRef;
 
   ctx!: AudioContext;
   master!: GainNode;
   noteMap = new Map<string, [OscillatorNode[], GainNode]>();
-  selectedNote = '';
-  selectedNotes = new Set<string>();
+  selectedNotes = new Array<boolean>(17);
   moog!: Tuna.TunaAudioNode;
   reverb!: Tuna.TunaAudioNode;
   compressor!: Tuna.TunaAudioNode;
   delay!: Tuna.TunaAudioNode;
-  envAttack = 0;
-  envDecay = 0;
-  envSustain = 1;
-  envRelease = 0;
+  envAttack = signal(0);
+  envDecay = signal(0);
+  envSustain = signal(1);
+  envRelease = signal(0);
   osc2Enabled = false;
   osc3Enabled = false;
   moogEnabled = false;
@@ -152,6 +157,10 @@ export class OscillatorComponent {
       this.compressor.connect(this.reverb);
       this.reverb.connect(this.ctx.destination);
     }
+    // draw envelope
+    effect(() => {
+      this.drawEnvelope(this.envAttack(), this.envDecay(), this.envSustain(), this.envRelease());
+    });
   }
 
   @HostListener('document:keydown', ['$event'])
@@ -162,14 +171,16 @@ export class OscillatorComponent {
       if (!note) {
         const noteIndex = KEYS.indexOf(event.key);
         if (noteIndex >= 0) {
-          this.selectedNotes.add(NOTES[noteIndex + 3]);
+          this.selectedNotes[noteIndex] = true;
           const freq = getHz(noteIndex - 21);
           const oscillators = [this.createOscillator(freq)];
+          // osc 2
           if (this.osc2Enabled) {
             const osc2 = this.createOscillator(freq);
             osc2.detune.value = 6;
             oscillators.push(osc2);
           }
+          // osc 3
           if (this.osc3Enabled) {
             const osc3 = this.createOscillator(freq);
             osc3.detune.value = -6;
@@ -177,11 +188,11 @@ export class OscillatorComponent {
           }
           // set volume
           this.master.gain.value = 0.7 - (oscillators.length * 0.2);
-          // set envelope
+          // create envelope
           const envelope = this.ctx.createGain();
           envelope.gain.setValueAtTime(0, this.ctx.currentTime);
-          envelope.gain.linearRampToValueAtTime(1, this.ctx.currentTime + this.envAttack);
-          envelope.gain.linearRampToValueAtTime(this.envSustain, this.ctx.currentTime + this.envAttack + this.envDecay);
+          envelope.gain.linearRampToValueAtTime(1, this.ctx.currentTime + this.envAttack());
+          envelope.gain.linearRampToValueAtTime(this.envSustain(), this.ctx.currentTime + this.envAttack() + this.envDecay());
           envelope.connect(this.master);
           // start sound
           oscillators.forEach(o => o.connect(envelope));
@@ -192,15 +203,14 @@ export class OscillatorComponent {
     } else {
       if (note) {
         const [oscillators, envelope] = note;
-        envelope.gain.linearRampToValueAtTime(0, this.ctx.currentTime + this.envRelease);
+        envelope.gain.linearRampToValueAtTime(0, this.ctx.currentTime + this.envRelease());
         oscillators.forEach(o => {
-          o.stop(this.ctx.currentTime + this.envRelease);
+          o.stop(this.ctx.currentTime + this.envRelease());
         });
         this.noteMap.delete(event.key);
-        this.selectedNotes.delete(NOTES[KEYS.indexOf(event.key) + 3]);
+        this.selectedNotes[KEYS.indexOf(event.key)] = false;
       }
     }
-    this.selectedNote = Array.from(this.selectedNotes).sort((a, b) => NOTES.indexOf(a) > NOTES.indexOf(b) ? 1 : -1).join(' + ');
   }
 
   setMoog(enabled: boolean) {
@@ -221,6 +231,37 @@ export class OscillatorComponent {
     oscNode.frequency.value = freq;
     return oscNode
   }
+
+  drawEnvelope(attack: number, decay: number, sustain: number, release: number) {
+    try {
+      const canvas = this.canvas.nativeElement;
+      const width = canvas.width - 4;
+      const height = canvas.height - 4;
+
+      const multiplier = width / 8;
+      const ctx = canvas.getContext('2d');
+      const sustainLength = 8 - attack - decay - release;
+      ctx.fillStyle = "rgb(8, 10, 88)";
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.lineWidth = 2;
+      ctx.fillStyle = 'rgb(30 46 55)';
+      ctx.strokeStyle = 'rgb(255 255 255)';
+      ctx.beginPath();
+      ctx.moveTo(2, 2 + height);
+      ctx.lineTo(2 + attack * multiplier, 2);
+      ctx.stroke();
+      ctx.lineTo(2 + (attack + decay) * multiplier, 2 + (1 - sustain) * height);
+      ctx.stroke();
+      ctx.lineTo(2 + (attack + decay + sustainLength) * multiplier, 2 + (1 - sustain) * height);
+      ctx.stroke();
+      ctx.lineTo(2 + (attack + decay + sustainLength + release) * multiplier, 2 + height);
+      ctx.stroke();
+      ctx.closePath();
+      ctx.fill();
+    } catch (e) {
+      // SSR fails with NotYetImplemented
+    }
+  }
 }
 
 function getAudioContext() {
@@ -228,5 +269,5 @@ function getAudioContext() {
 }
 
 const getHz = (n = 0) => 440 * Math.pow(2, n / 12);
-const NOTES = ['A3', 'A#3', 'B3', 'C4', 'C#4', 'D4', 'D#4', 'E4', 'F4', 'F#4', 'G4', 'G#4', 'A4', 'A#4', 'B4', 'C5', 'C#5', 'D5', 'D#5', 'E5', 'F5', 'F#5', 'G5', 'G#5'];
+// const NOTES = ['C4', 'C#4', 'D4', 'D#4', 'E4', 'F4', 'F#4', 'G4', 'G#4', 'A4', 'A#4', 'B4', 'C5', 'C#5', 'D5', 'D#5', 'E5', 'F5', 'F#5', 'G5', 'G#5'];
 const KEYS = ['a', 'w', 's', 'e', 'd', 'f', 't', 'g', 'y', 'h', 'u', 'j', 'k', 'o', 'l', 'p', ';', "'"];

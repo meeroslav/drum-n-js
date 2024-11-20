@@ -10,6 +10,3 @@ export function calculatePosition(note: number) {
   return position;
 }
 
-export function indexToFrequency(index: number) {
-  return 440 * Math.pow(2, index / 12);
-}

@@ -1,8 +1,8 @@
 import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { NOTES, SynthNote } from './sequencer';
-import { calculateOctave, calculatePosition, indexToFrequency } from './helper-functions';
+import { calculateOctave, calculatePosition } from './helper-functions';
+import { indexToFrequency, NOTES, SynthNote } from '@drum-n-js/audio-utils';
 
 @Component({
   // eslint-disable-next-line @angular-eslint/component-selector
@@ -23,10 +23,10 @@ import { calculateOctave, calculatePosition, indexToFrequency } from './helper-f
               <div class="sm:flex sm:items-start">
                 <div class="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
                   <h3 class="text-base font-semibold text-gray-900" id="modal-title">Change note</h3>
-                  <div class="mt-2">
-                    <button (click)="changeNote('-')">Extend previous</button>
-                    <button (click)="changeNote(undefined)">Clear</button>
-                    <button (click)="changeNote(3)">C</button>
+                  <div class="mt-2 flex space-x-1">
+                    <button class="border border-fd-foreground/10 bg-slate-500 rounded text-xs p-1" (click)="changeNote('-')">Extend</button>
+                    <button class="border border-fd-foreground/10 bg-red-500 rounded text-xs p-1" (click)="changeNote(undefined)">Clear</button>
+                    <button class="border border-fd-foreground/10 bg-blue-500 rounded text-xs p-1" (click)="changeNote(3)">C</button>
                   </div>
                 </div>
               </div>
@@ -51,7 +51,6 @@ export class SynthNoteComponent {
       if (note === '-') {
         return '-';
       } else {
-        console.log(Math.abs((note - 3) % 12), (note - 3) % 12);
         return this.NOTES[calculatePosition(note)] + calculateOctave(note);
       }
     }

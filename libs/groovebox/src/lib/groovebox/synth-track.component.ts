@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { SynthNote, SynthTrack, TrackBase } from './sequencer';
+import { SynthNote, SynthTrack, TrackBase } from '@drum-n-js/audio-utils';
 import { SynthNoteComponent } from './synth-note.component';
 
 @Component({
@@ -14,6 +14,7 @@ import { SynthNoteComponent } from './synth-note.component';
   <ng-container *ngIf="synthTrack() as synthTrack">
   <div class="grid grid-col-1 space-y-1">
     <div class="flex items-center space-x-2">
+      <h3 class="font-bold bg-blue-500 px-2">SYNTH</h3>
       <label class="mr-4 text-slate-500" for="volume">Volume</label>
       <input class="w-32" type="range" min="0" max="1" step="0.01" [(ngModel)]="synthTrack.volume" />
     </div>

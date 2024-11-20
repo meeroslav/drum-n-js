@@ -1,14 +1,12 @@
 import { ChangeDetectionStrategy, Component, signal, WritableSignal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Sequencer } from './sequencer';
 import { SequencerTrackComponent } from './track.component';
-import { createAudioContext, loadDrumSamples } from '@drum-n-js/audio-utils';
+import { createAudioContext, loadSamples, stepBpmDuration, DrumTrack, GrooveboxTrack, SamplerTrack, Sequencer, createDrumTrack, createSynthTrack, createSamplerTrack, SynthTrack } from '@drum-n-js/audio-utils';
 
 // TODO:
 // -- Add synth track
-// -- Add sample track
-// -- Handle track volume and pan
+// -- Handle track pan
 // -- Handle track reverberation
 // -- Add master cutoff
 // -- Prepare patches
@@ -27,7 +25,7 @@ import { createAudioContext, loadDrumSamples } from '@drum-n-js/audio-utils';
       <label class="mr-4 text-slate-500" for="tempo">BPM</label>
       <input class="w-16 rounded bg-slate-500 p-1" type="number" [ngModel]="sequencer().tempo" (ngModelChange)="updateTempo($event)" />
       <label class="mr-4 text-slate-500" for="volume">Volume</label>
-      <input class="w-32" type="range" min="0" max="1" step="0.01" [ngModel]="sequencer().volume" (ngModelChange)="updateVolume($event)" />
+      <input class="w-32" type="range" min="0" max="1" step="0.01" [ngModel]="sequencer().volume" (ngModelChange)="updateMasterVolume($event)" />
       <canvas class="rounded" #canvas width="100" height="32"></canvas>
     </div>
     @if (noContextError) {
@@ -37,6 +35,7 @@ import { createAudioContext, loadDrumSamples } from '@drum-n-js/audio-utils';
     }
     <div class="flex items-center space-x-2 mt-4">
       <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-4 rounded" (click)="addSynthTrack()">Add Synth Track</button>
+      <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-4 rounded" (click)="addSamplerTrack()">Add Sampler Track</button>
       <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-4 rounded" (click)="addDrumTrack()">Add Drum Track</button>
     </div>
     <div class="mt-4 grid grid-cols-1 gap-2">
@@ -75,7 +74,7 @@ export class GrooveboxComponent {
     this.audioContext = createAudioContext();
     if (this.audioContext) {
       this.noContextError = false;
-      loadDrumSamples(this.audioContext).then(buffers => {
+      loadSamples(this.audioContext).then(buffers => {
         this.loadingSamplesWarning = false;
         this.buffers = buffers;
       });
@@ -98,14 +97,12 @@ export class GrooveboxComponent {
     } else {
       clearTimeout(this.clock);
     }
-    console.log(this.sequencer());
   }
 
   scheduleNotes() {
     if (!this.audioContext) {
       return;
     }
-    console.log('scheduling notes');
     let currentTime = this.audioContext.currentTime;
     currentTime -= this.startTime;
 
@@ -123,63 +120,106 @@ export class GrooveboxComponent {
   }
 
   playPatternStep(playTime: number) {
-    this.sequencer().tracks.forEach(track => {
+    this.sequencer().tracks.forEach((track, _, tracks) => {
+      if (track.mute) {
+        this.muteTrack(track);
+        return;
+      }
+      if (!track.solo && tracks.some(t => t.solo)) {
+        this.muteTrack(track);
+        return;
+      }
+      this.setTrackVolume(track);
       if (track.type === 'SYNTH') {
-        // this.playSynthTrack(track, playTime);
+        this.playSynth(playTime, track);
+      } else if (track.type === 'SAMPLER' && track.sequence[this.currentStep]) {
+        this.playRomplerSample(playTime, track);
       } else if (track.type === 'DRUM' && track.sequence[this.currentStep]) {
-        this.playSample(track.sample, playTime);
+        this.playSample(playTime, track);
       }
     });
     // this.noteTime += 60 / this.sequencer().tempo;
   }
 
-  playSample(sample: string, when: number) {
+  private muteTrack(track: GrooveboxTrack) {
+    if (track.gain) {
+      track.gain.gain.value = 0;
+    }
+  }
+
+  private setTrackVolume(track: GrooveboxTrack) {
+    if (track.gain) {
+      track.gain.gain.value = track.volume;
+    }
+  }
+
+  playSample(when: number, track: DrumTrack) {
     if (!this.audioContext) {
       return;
     }
     const source = this.audioContext.createBufferSource();
-    source.buffer = this.buffers[sample];
-    source.connect(this.master);
+    source.buffer = this.buffers[track.sample];
+    source.connect(track.gain);
+    track.gain.connect(this.master);
     source.start(when || 0);
   }
 
+  playRomplerSample(when: number, track: SamplerTrack) {
+    const note = track.sequence[this.currentStep];
+    if (!this.audioContext || !note.note) {
+      return;
+    }
+    if (note.note === '-') {
+      // TODO: how to handle rest?
+      return;
+    }
+    const source = this.audioContext.createBufferSource();
+    source.buffer = this.buffers[track.sample];
+    source.detune.value = (note.note - 3) * 100;
+    source.connect(track.gain);
+    track.gain.connect(this.master);
+    source.start(when || 0);
+  }
+
+  playSynth(when: number, track: SynthTrack) {
+    const note = track.sequence[this.currentStep];
+    if (!this.audioContext || !note?.note) {
+      return;
+    }
+    if (note.note === '-') {
+      // TODO: how to handle rest?
+      return;
+    }
+    // const source = { function to create the node }
+    // source.frequency.value = freq;
+    // source.connect(track.gain);
+    // track.gain.connect(this.master);
+    // source.start(when || 0);
+  }
+
   addSynthTrack() {
-    this.sequencer().tracks.push({
-      id: Math.random().toString(36),
-      type: 'SYNTH',
-      volume: 1,
-      reverb: 0,
-      solo: false,
-      mute: false,
-      patch: 'base',
-      envelope: {
-        attack: 0.1,
-        decay: 0.1,
-        sustain: 0.1,
-        release: 0.1
-      },
-      sequence: [{ note: 3, frequency: 220 }, { note: '-' }, { note: 23, frequency: 1400 }, { note: 2, frequency: 1400 }]
-    });
+    if (this.audioContext) {
+      this.sequencer().tracks.push(createSynthTrack(this.audioContext));
+    }
   }
 
   addDrumTrack() {
-    this.sequencer().tracks.push({
-      id: Math.random().toString(36),
-      type: 'DRUM',
-      volume: 1,
-      reverb: 0,
-      solo: false,
-      mute: false,
-      sample: 'kick',
-      sequence: []
-    });
+    if (this.audioContext) {
+      this.sequencer().tracks.push(createDrumTrack(this.audioContext));
+    }
+  }
+
+  addSamplerTrack() {
+    if (this.audioContext) {
+      this.sequencer().tracks.push(createSamplerTrack(this.audioContext));
+    }
   }
 
   deleteTrack(id: string) {
     this.sequencer().tracks = this.sequencer().tracks.filter(track => track.id !== id);
   }
 
-  updateVolume(volume: number) {
+  updateMasterVolume(volume: number) {
     this.sequencer().volume = volume;
     this.master.gain.value = volume;
   }
@@ -190,6 +230,6 @@ export class GrooveboxComponent {
   }
 
   private calculateTic() {
-    this.tic = 60 / this.sequencer().tempo / 4;
+    this.tic = stepBpmDuration(this.sequencer().tempo);
   }
 }

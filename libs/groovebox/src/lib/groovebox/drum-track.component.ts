@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, input, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { DrumTrack, TrackBase } from './sequencer';
+import { DrumTrack, TrackBase } from '../../../../audio-utils/src/lib/sequencer';
 import { DRUM_SAMPLES } from '@drum-n-js/audio-utils';
 
 @Component({
@@ -13,7 +13,8 @@ import { DRUM_SAMPLES } from '@drum-n-js/audio-utils';
   template: `
 <ng-container *ngIf="drumTrack() as drumTrack">
   <div class="grid grid-col-1 space-y-1">
-    <div class="flex items-center space-x-2">
+    <div class="flex items-center space-x-2 mb-1">
+      <h3 class="font-bold bg-red-500 px-2">DRUM</h3>
       <span class="text-slate-500">Sample</span>
       <select
         [(ngModel)]="drumTrack.sample"

@@ -2,7 +2,12 @@ import { ChangeDetectionStrategy, Component, signal, WritableSignal } from '@ang
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { SequencerTrackComponent } from './track.component';
-import { createAudioContext, loadSamples, stepBpmDuration, DrumTrack, GrooveboxTrack, SamplerTrack, Sequencer, createDrumTrack, createSynthTrack, createSamplerTrack, SynthTrack } from '@drum-n-js/audio-utils';
+import {
+  createAudioContext, loadSamples, stepBpmDuration, DrumTrack,
+  GrooveboxTrack, SamplerTrack, Sequencer, createDrumTrack,
+  createSynthTrack, createSamplerTrack, SynthTrack, SimplePatch,
+  BornSlippyPatch
+} from '@drum-n-js/audio-utils';
 
 // TODO:
 // -- Add synth track
@@ -179,6 +184,7 @@ export class GrooveboxComponent {
     source.connect(track.gain);
     track.gain.connect(this.master);
     source.start(when || 0);
+    source.stop(when + this.tic);
   }
 
   playSynth(when: number, track: SynthTrack) {
@@ -190,11 +196,11 @@ export class GrooveboxComponent {
       // TODO: how to handle rest?
       return;
     }
-    // const source = { function to create the node }
-    // source.frequency.value = freq;
-    // source.connect(track.gain);
-    // track.gain.connect(this.master);
-    // source.start(when || 0);
+    const source = new BornSlippyPatch(this.audioContext);
+    source.connect(track.gain);
+    track.gain.connect(this.master);
+    source.start(when || 0);
+    source.stop(when + this.tic);
   }
 
   addSynthTrack() {
@@ -216,6 +222,7 @@ export class GrooveboxComponent {
   }
 
   deleteTrack(id: string) {
+    //TODO: disconnect track from master
     this.sequencer().tracks = this.sequencer().tracks.filter(track => track.id !== id);
   }
 

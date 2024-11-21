@@ -81,7 +81,7 @@ export function createSynthTrack(context: AudioContext): SynthTrack {
       release: 0
     },
     gain: context.createGain(),
-    sequence: [{ note: 3, frequency: 220 }, { note: '-' }, { note: 23, frequency: 1400 }, { note: 2, frequency: 1400 }]
+    sequence: [{ note: 3, frequency: 220 }, { note: '-', frequency: 0 }, { note: 23, frequency: 1400 }, { note: 2, frequency: 1400 }]
   }
 }
 export function createSamplerTrack(context: AudioContext): SamplerTrack {

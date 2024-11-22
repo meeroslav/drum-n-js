@@ -13,7 +13,7 @@ export type TrackBase = {
 
 export type SynthTrack = {
   type: 'SYNTH';
-  patch: (typeof PATCHES)[number];
+  patch: (typeof PATCHES)[number]['name'];
   sequence: SynthNote[];
 } & TrackBase;
 
@@ -67,7 +67,7 @@ export function createSynthTrack(context: AudioContext): SynthTrack {
     reverb: 0,
     solo: false,
     mute: false,
-    patch: 'bass',
+    patch: 'Born Slippy',
     gain: context.createGain(),
     sequence: [{ note: -9, frequency: 220 }, { note: '-', frequency: 0 }, { note: 11, frequency: 1400 }, { note: -10, frequency: 1400 }]
   }

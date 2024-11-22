@@ -2222,6 +2222,7 @@ __metadata:
     jest: "npm:^29.7.0"
     jest-environment-jsdom: "npm:^29.7.0"
     jest-preset-angular: "npm:~14.1.0"
+    lucide-angular: "npm:^0.460.0"
     nx: "npm:20.1.0"
     postcss: "npm:^8.4.5"
     prettier: "npm:^2.6.2"
@@ -11762,6 +11763,18 @@ __metadata:
   dependencies:
     yallist: "npm:^3.0.2"
   checksum: 10c0/89b2ef2ef45f543011e38737b8a8622a2f8998cddf0e5437174ef8f1f70a8b9d14a918ab3e232cb3ba343b7abddffa667f0b59075b2b80e6b4d63c3de6127482
+  languageName: node
+  linkType: hard
+
+"lucide-angular@npm:^0.460.0":
+  version: 0.460.0
+  resolution: "lucide-angular@npm:0.460.0"
+  dependencies:
+    tslib: "npm:^2.3.0"
+  peerDependencies:
+    "@angular/common": 13.x - 18.x
+    "@angular/core": 13.x - 18.x
+  checksum: 10c0/29e3f3e4ffebe5c34dc79dffe5fcd98a4fa75dd02a04a917399cd1949e5e7e18e043c28a2d98a1ba2b36f91de59278cecd922d2c068d2783246843d693872b6e
   languageName: node
   linkType: hard
 

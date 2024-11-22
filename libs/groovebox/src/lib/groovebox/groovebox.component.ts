@@ -10,27 +10,36 @@ import {
   startEnvelope,
   endEnvelope
 } from '@drum-n-js/audio-utils';
+import { LucideAngularModule, AudioWaveform, Drum, AudioLines, Play, Square, TriangleRight, Gauge } from 'lucide-angular';
 
 // TODO:
 // -- Handle track pan
 // -- Handle track reverberation
 // -- Add note sequencing
 // -- Add master cutoff
-// -- Prepare patches
+// -- Prepare patches`
 
 @Component({
   selector: 'lib-groovebox',
   standalone: true,
-  imports: [CommonModule, FormsModule, SequencerTrackComponent],
+  imports: [CommonModule, FormsModule,
+    LucideAngularModule,
+    SequencerTrackComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <h2 class="text-4xl font-extrabold mb-4">Groovebox</h2>
     <div class="flex items-center space-x-2">
       <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-4 rounded" (click)="togglePlay()">
-        {{ isPlaying ? 'Stop' : 'Play' }}
+        @if (isPlaying) {
+          <i-lucide [img]="StopIcon" class="inline-block w-4 h-4 -mt-1 mr-1"></i-lucide>
+        } @else {
+          <i-lucide [img]="PlayIcon" class="inline-block w-4 h-4 -mt-1 mr-1"></i-lucide>
+        }
       </button>
+      <i-lucide [img]="GaugeIcon" class="inline-block w-4 h-4 -mt-1 mr-1 ml-1"></i-lucide>
       <label class="mr-4 text-slate-500" for="tempo">BPM</label>
       <input class="w-16 rounded bg-slate-500 p-1" type="number" [ngModel]="sequencer().tempo" (ngModelChange)="updateTempo($event)" />
+      <i-lucide [img]="VolumeIcon" class="inline-block w-4 h-4 -mt-1 mr-1 ml-1"></i-lucide>
       <label class="mr-4 text-slate-500" for="volume">Volume</label>
       <input class="w-32" type="range" min="0" max="1" step="0.01" [ngModel]="sequencer().volume" (ngModelChange)="updateMasterVolume($event)" />
       <canvas class="rounded" #canvas width="100" height="32"></canvas>
@@ -41,9 +50,15 @@ import {
       <h1 class="text-yellow-500 text-4xl rounded bg-slate-200">Loading drum samples...</h1>
     }
     <div class="flex items-center space-x-2 mt-4">
-      <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-4 rounded" (click)="addSynthTrack()">Add Synth Track</button>
-      <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-4 rounded" (click)="addSamplerTrack()">Add Sampler Track</button>
-      <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-4 rounded" (click)="addDrumTrack()">Add Drum Track</button>
+      <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-4 rounded" (click)="addSynthTrack()">
+        <i-lucide [img]="AudioWaveformIcon" class="inline-block w-4 h-4 -mt-1 mr-1"></i-lucide>
+        Add Synth Track</button>
+      <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-4 rounded" (click)="addSamplerTrack()">
+        <i-lucide [img]="AudioLinesIcon" class="inline-block w-4 h-4 -mt-1 mr-1"></i-lucide>
+        Add Sampler Track</button>
+      <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-4 rounded" (click)="addDrumTrack()">
+        <i-lucide [img]="DrumIcon" class="inline-block w-4 h-4 -mt-1 mr-1"></i-lucide>
+        Add Drum Track</button>
     </div>
     <div class="mt-4 grid grid-cols-1 gap-2">
       @for (track of sequencer().tracks; track track.id) {
@@ -53,6 +68,14 @@ import {
   `
 })
 export class GrooveboxComponent implements OnDestroy {
+  readonly AudioWaveformIcon = AudioWaveform;
+  readonly DrumIcon = Drum;
+  readonly AudioLinesIcon = AudioLines;
+  readonly PlayIcon = Play;
+  readonly StopIcon = Square;
+  readonly VolumeIcon = TriangleRight;
+  readonly GaugeIcon = Gauge;
+  // state
   audioContext!: AudioContext | undefined;
   master!: GainNode;
   buffers!: Record<string, AudioBuffer>;

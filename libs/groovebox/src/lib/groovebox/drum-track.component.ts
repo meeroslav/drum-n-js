@@ -3,18 +3,21 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DrumTrack, TrackBase } from '../../../../audio-utils/src/lib/sequencer';
 import { DRUM_SAMPLES } from '@drum-n-js/audio-utils';
+import { LucideAngularModule, Drum } from 'lucide-angular';
 
 @Component({
   // eslint-disable-next-line @angular-eslint/component-selector
   selector: 'drum-track',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, LucideAngularModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
 <ng-container *ngIf="drumTrack() as drumTrack">
   <div class="grid grid-col-1 space-y-1">
     <div class="flex items-center space-x-2 mb-1">
-      <h3 class="font-bold bg-red-500 px-2">DRUM</h3>
+      <h3 class="font-bold bg-red-500 px-2">
+        <i-lucide [img]="DrumIcon" class="inline-block w-4 h-4 -mt-1 mr-1"></i-lucide>
+      </h3>
       <span class="text-slate-500">Sample</span>
       <select
         [(ngModel)]="drumTrack.sample"
@@ -111,6 +114,7 @@ import { DRUM_SAMPLES } from '@drum-n-js/audio-utils';
   `
 })
 export class DrumTrackComponent {
+  readonly DrumIcon = Drum;
   track = input.required<TrackBase>();
   drumTrack = computed(() => this.track() as DrumTrack);
   arr = new Array(16);

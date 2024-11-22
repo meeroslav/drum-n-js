@@ -69,7 +69,7 @@ export function createSynthTrack(context: AudioContext): SynthTrack {
     mute: false,
     patch: 'Born Slippy',
     gain: context.createGain(),
-    sequence: [{ note: -9, frequency: 220 }, { note: '-', frequency: 0 }, { note: 11, frequency: 1400 }, { note: -10, frequency: 1400 }]
+    sequence: []
   }
 }
 export function createSamplerTrack(context: AudioContext): SamplerTrack {

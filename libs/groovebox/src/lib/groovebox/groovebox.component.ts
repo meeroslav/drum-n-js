@@ -15,9 +15,9 @@ import { LucideAngularModule, AudioWaveform, Drum, AudioLines, Play, Square, Tri
 // TODO:
 // -- Handle track pan
 // -- Handle track reverberation
-// -- Add note sequencing
 // -- Add master cutoff
-// -- Prepare patches`
+// -- Prepare patches
+// -- Add sample envelopes controle
 
 @Component({
   selector: 'lib-groovebox',
@@ -62,7 +62,7 @@ import { LucideAngularModule, AudioWaveform, Drum, AudioLines, Play, Square, Tri
     </div>
     <div class="mt-4 grid grid-cols-1 gap-2">
       @for (track of sequencer().tracks; track track.id) {
-        <sequencer-track [track]="track" (deleteTrack)="deleteTrack($event)"></sequencer-track>
+        <sequencer-track [track]="track" (deleteTrack)="deleteTrack($event)" (clearTrack)="clearTrack($event)"></sequencer-track>
       }
     </div>
   `
@@ -270,8 +270,21 @@ export class GrooveboxComponent implements OnDestroy {
   }
 
   deleteTrack(id: string) {
-    //TODO: disconnect track from master
-    this.sequencer().tracks = this.sequencer().tracks.filter(track => track.id !== id);
+    const track = this.sequencer().tracks.find(track => track.id === id);
+    if (track) {
+      track.gain.disconnect();
+      this.sequencer().tracks = this.sequencer().tracks.filter(track => track.id !== id);
+    }
+  }
+
+  clearTrack(id: string) {
+    const index = this.sequencer().tracks.findIndex(track => track.id === id);
+    if (index !== -1) {
+      this.sequencer().tracks[index] = {
+        ...this.sequencer().tracks[index],
+        sequence: []
+      }
+    }
   }
 
   updateMasterVolume(volume: number) {

@@ -69,7 +69,7 @@ import { LucideAngularModule, Drum } from 'lucide-angular';
         8
       </button>
       <button class="border border-fd-foreground/30 rounded p-2"
-        [ngClass]="drumTrack.sequence[8] ? 'bg-slate-400': 'bg-fd-foreground/30'"
+        [ngClass]="drumTrack.sequence[8] ? 'bg-slate-400': 'bg-fd-background/30'"
         (click)="toggleStep(8)">
         9
       </button>
@@ -89,7 +89,7 @@ import { LucideAngularModule, Drum } from 'lucide-angular';
         12
       </button>
       <button class="border border-fd-foreground/30 rounded p-2"
-        [ngClass]="drumTrack.sequence[12] ? 'bg-slate-400': 'bg-fd-foreground/30'"
+        [ngClass]="drumTrack.sequence[12] ? 'bg-slate-400': 'bg-fd-background/30'"
         (click)="toggleStep(12)">
         13
       </button>

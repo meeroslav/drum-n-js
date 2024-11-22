@@ -71,11 +71,12 @@ export class BornSlippyPatch {
     this._master.gain.value = 0.7;
     this._envelope = context.createGain();
     const tuna = new Tuna(context);
-    const moog = new tuna.MoogFilter({
-      cutoff: 0.165,    // 0 to 1
-      resonance: 1.5,   // 0 to 4
-      bufferSize: 4096,  // 256 to 16384, NOT INCLUDED AS EDITABLE!
-    });
+    // const moog = new tuna.MoogFilter({
+    //   cutoff: 0.165,    // 0 to 1
+    //   resonance: 1.5,   // 0 to 4
+    //   bufferSize: 4096,  // 256 to 16384, NOT INCLUDED AS EDITABLE!
+    // });
+    const moog = context.createGain();
     const delay = new tuna.Delay({
       delayTime: 300,    // 1 to 10000 milliseconds
       feedback: 0.45,    // 0 to 1+
@@ -93,7 +94,7 @@ export class BornSlippyPatch {
   start(when?: number) {
     when = when ?? this._master.context.currentTime;
     this._oscillators.forEach(osc => {
-      startEnvelope(this._envelope, 0.01, 0.5, 0.5);
+      startEnvelope(this._envelope, 0.01, 0.2, 0.5);
       // start
       osc.start(when);
     });

@@ -27,7 +27,7 @@ import { AudioWaveform, LucideAngularModule } from 'lucide-angular';
       <label class="mr-4 text-slate-500" for="volume">Volume</label>
       <input class="w-32" type="range" min="0" max="1" step="0.01" [(ngModel)]="synthTrack.volume" />
     </div>
-    <div class="grid grid-cols-16 gap-0.5">
+    <div class="grid grid-cols-16 gap-1">
       <synth-note [note]="synthTrack.sequence[0]" (setNote)="setNote(0, $event)"></synth-note>
       <synth-note [note]="synthTrack.sequence[1]" (setNote)="setNote(1, $event)"></synth-note>
       <synth-note [note]="synthTrack.sequence[2]" (setNote)="setNote(2, $event)"></synth-note>

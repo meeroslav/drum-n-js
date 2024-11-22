@@ -1,18 +1,20 @@
-import { ChangeDetectionStrategy, Component, signal, WritableSignal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, signal, WritableSignal, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { SequencerTrackComponent } from './track.component';
 import {
   createAudioContext, loadSamples, stepBpmDuration, DrumTrack,
   GrooveboxTrack, SamplerTrack, Sequencer, createDrumTrack,
-  createSynthTrack, createSamplerTrack, SynthTrack, SimplePatch,
-  BornSlippyPatch
+  createSynthTrack, createSamplerTrack, SynthTrack,
+  BornSlippyPatch,
+  startEnvelope,
+  endEnvelope
 } from '@drum-n-js/audio-utils';
 
 // TODO:
-// -- Add synth track
 // -- Handle track pan
 // -- Handle track reverberation
+// -- Add note sequencing
 // -- Add master cutoff
 // -- Prepare patches
 
@@ -50,14 +52,14 @@ import {
     </div>
   `
 })
-export class GrooveboxComponent {
+export class GrooveboxComponent implements OnDestroy {
   audioContext!: AudioContext | undefined;
   master!: GainNode;
   buffers!: Record<string, AudioBuffer>;
   isPlaying = false;
   sequencer!: WritableSignal<Sequencer>;
   // consts
-  DEFAULT_TEMPO = 123;
+  DEFAULT_TEMPO = 125;
   // errors
   noContextError = false;
   loadingSamplesWarning = true;
@@ -90,6 +92,10 @@ export class GrooveboxComponent {
     } else {
       this.noContextError = true;
     }
+  }
+
+  ngOnDestroy() {
+    clearTimeout(this.clock);
   }
 
   togglePlay() {
@@ -181,10 +187,18 @@ export class GrooveboxComponent {
     const source = this.audioContext.createBufferSource();
     source.buffer = this.buffers[track.sample];
     source.detune.value = (note.note - 3) * 100;
-    source.connect(track.gain);
+    const envelope = this.audioContext.createGain();
+    envelope.gain.value = 0;
+    source.connect(envelope);
+    envelope.connect(track.gain);
     track.gain.connect(this.master);
+    // set start
     source.start(when || 0);
-    source.stop(when + this.tic);
+    startEnvelope(envelope, track.envelope.attack, track.envelope.decay, track.envelope.sustain, when);
+    // set end
+    const duration = this.calculateNoteDuration(track);
+    endEnvelope(envelope, track.envelope.release, when + duration);
+    source.stop(when + duration + track.envelope.release);
   }
 
   playSynth(when: number, track: SynthTrack) {
@@ -198,9 +212,20 @@ export class GrooveboxComponent {
     }
     const source = new BornSlippyPatch(this.audioContext);
     source.connect(track.gain);
+    source.frequency = note.frequency || 440;
     track.gain.connect(this.master);
     source.start(when || 0);
-    source.stop(when + this.tic);
+    source.stop(when + this.calculateNoteDuration(track));
+  }
+
+  private calculateNoteDuration(track: SynthTrack | SamplerTrack) {
+    let nextPos = (this.currentStep + 1) % 16;
+    let duration = this.tic;
+    while (track.sequence[nextPos] && track.sequence[nextPos].note === '-') {
+      duration += this.tic;
+      nextPos = (nextPos + 1) % 16;
+    }
+    return duration;
   }
 
   addSynthTrack() {

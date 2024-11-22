@@ -1,5 +1,17 @@
 import Tuna from 'tunajs';
 
+export function startEnvelope(envelopeNode: GainNode, attack: number, decay: number, sustain: number, when?: number) {
+  const startTime = when ?? envelopeNode.context.currentTime;
+  envelopeNode.gain.setValueAtTime(0, startTime);
+  envelopeNode.gain.linearRampToValueAtTime(1, startTime + attack);
+  envelopeNode.gain.linearRampToValueAtTime(sustain, startTime + attack + decay);
+}
+
+export function endEnvelope(envelopeNode: GainNode, release: number, when?: number) {
+  const endTime = when ?? envelopeNode.context.currentTime;
+  envelopeNode.gain.linearRampToValueAtTime(0, endTime + release);
+}
+
 // Most basic audio patch
 export class SimplePatch {
   private _frequency = 0;
@@ -81,6 +93,8 @@ export class BornSlippyPatch {
   start(when?: number) {
     when = when ?? this._master.context.currentTime;
     this._oscillators.forEach(osc => {
+      startEnvelope(this._envelope, 0.01, 0.5, 0.5);
+      // start
       osc.start(when);
     });
   }
@@ -88,7 +102,8 @@ export class BornSlippyPatch {
   stop(when?: number) {
     when = when ?? this._master.context.currentTime;
     this._oscillators.forEach(osc => {
-      osc.stop(when);
+      endEnvelope(this._envelope, 1);
+      osc.stop(when + 1);
     });
   }
 

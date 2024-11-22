@@ -14,12 +14,6 @@ export type TrackBase = {
 export type SynthTrack = {
   type: 'SYNTH';
   patch: (typeof PATCHES)[number];
-  envelope: {
-    attack: number;
-    decay: number;
-    sustain: number;
-    release: number;
-  };
   sequence: SynthNote[];
 } & TrackBase;
 
@@ -74,14 +68,8 @@ export function createSynthTrack(context: AudioContext): SynthTrack {
     solo: false,
     mute: false,
     patch: 'bass',
-    envelope: {
-      attack: 0,
-      decay: 0,
-      sustain: 1,
-      release: 0
-    },
     gain: context.createGain(),
-    sequence: [{ note: 3, frequency: 220 }, { note: '-', frequency: 0 }, { note: 23, frequency: 1400 }, { note: 2, frequency: 1400 }]
+    sequence: [{ note: -9, frequency: 220 }, { note: '-', frequency: 0 }, { note: 11, frequency: 1400 }, { note: -10, frequency: 1400 }]
   }
 }
 export function createSamplerTrack(context: AudioContext): SamplerTrack {
@@ -96,7 +84,7 @@ export function createSamplerTrack(context: AudioContext): SamplerTrack {
       attack: 0,
       decay: 0,
       sustain: 1,
-      release: 0
+      release: 2
     },
     sample: 'piano_c',
     gain: context.createGain(),

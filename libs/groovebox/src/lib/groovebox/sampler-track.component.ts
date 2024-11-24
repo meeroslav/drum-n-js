@@ -27,6 +27,32 @@ import { AudioLines, LucideAngularModule } from 'lucide-angular';
       <label class="mr-4 text-slate-500" for="volume">Volume</label>
       <input class="w-32" type="range" min="0" max="1" step="0.01" [(ngModel)]="samplerTrack.volume" />
     </div>
+    <div class="flex items-center space-x-2 mb-1">
+      <label for="attact">Attack</label>
+      <input
+          class="mr-2"
+          id="attack"
+          [(ngModel)]="samplerTrack.envelope.attack"
+          type="range" min="0" max="2" step="0.01" />
+      <label for="decay">Decay</label>
+      <input
+          class="mr-2"
+          id="decay"
+          [(ngModel)]="samplerTrack.envelope.decay"
+          type="range" min="0" max="2" step="0.01" />
+      <label for="sustain">Sustain</label>
+      <input
+            class="mr-2"
+            id="sustain"
+            [(ngModel)]="samplerTrack.envelope.sustain"
+            type="range" min="0" max="1" step="0.01" />
+      <label for="release">Release</label>
+      <input
+            class="mr-2"
+            id="release"
+            [(ngModel)]="samplerTrack.envelope.release"
+            type="range" min="0" max="2" step="0.01" />
+    </div>
     <div class="grid grid-cols-16 gap-1">
       <synth-note [note]="samplerTrack.sequence[0]" (setNote)="setNote(0, $event)"></synth-note>
       <synth-note [note]="samplerTrack.sequence[1]" (setNote)="setNote(1, $event)"></synth-note>

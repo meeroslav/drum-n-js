@@ -71,12 +71,14 @@ export class BornSlippyPatch {
     this._master.gain.value = 0.7;
     this._envelope = context.createGain();
     const tuna = new Tuna(context);
-    // const moog = new tuna.MoogFilter({
-    //   cutoff: 0.165,    // 0 to 1
-    //   resonance: 1.5,   // 0 to 4
-    //   bufferSize: 4096,  // 256 to 16384, NOT INCLUDED AS EDITABLE!
-    // });
-    const moog = context.createGain();
+    const reverb = new tuna.Convolver({
+      highCut: 10000,                         // 20 to 22050
+      lowCut: 440,                             // 20 to 22050
+      dryLevel: 1,                            // 0 to 1+
+      wetLevel: 0.6,                            // 0 to 1+
+      level: 1,                               // 0 to 1+, adjusts total output of both wet and dry
+      impulse: 'impulse_rev.wav',            // the path to your impulse response
+    });
     const delay = new tuna.Delay({
       delayTime: 300,    // 1 to 10000 milliseconds
       feedback: 0.45,    // 0 to 1+
@@ -86,8 +88,8 @@ export class BornSlippyPatch {
     this._oscillators.forEach(osc => {
       osc.connect(this._envelope);
     });
-    this._envelope.connect(moog);
-    moog.connect(delay);
+    this._envelope.connect(reverb);
+    reverb.connect(delay);
     delay.connect(this._master);
   }
 

@@ -13,11 +13,9 @@ import {
 import { LucideAngularModule, AudioWaveform, Drum, AudioLines, Play, Square, TriangleRight, Gauge } from 'lucide-angular';
 
 // TODO:
-// -- Handle track pan
 // -- Handle track reverberation
 // -- Add master cutoff
 // -- Prepare patches
-// -- Add sample envelopes controle
 
 @Component({
   selector: 'lib-groovebox',

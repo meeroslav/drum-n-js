@@ -1,4 +1,4 @@
-import { BornSlippyPatch } from './patches';
+import { BornSlippyPatch, SimplePatch } from './patches';
 
 export const LOW_PASS_MIN = 40;
 
@@ -18,7 +18,8 @@ export const ROMPLER_SAMPLES = [
 
 // synth related
 export const PATCHES = [
-  { name: 'Born Slippy', ctor: BornSlippyPatch }
+  { name: 'Born Slippy', ctor: BornSlippyPatch },
+  { name: 'Simple Triangle', ctor: SimplePatch }
 ] as const;
 
 // drum related

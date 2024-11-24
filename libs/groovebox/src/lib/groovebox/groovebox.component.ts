@@ -15,7 +15,9 @@ import { LucideAngularModule, AudioWaveform, Drum, AudioLines, Play, Square, Tri
 // TODO:
 // -- Handle track reverberation
 // -- Add master cutoff
-// -- Prepare patches
+// -- Add more patches
+// -- Add more samples
+// -- Improve performance
 
 @Component({
   selector: 'lib-groovebox',
@@ -170,7 +172,6 @@ export class GrooveboxComponent implements OnDestroy {
         this.playSample(playTime, track);
       }
     });
-    // this.noteTime += 60 / this.sequencer().tempo;
   }
 
   private muteTrack(track: GrooveboxTrack) {
@@ -202,7 +203,6 @@ export class GrooveboxComponent implements OnDestroy {
       return;
     }
     if (note.note === '-') {
-      // TODO: how to handle rest?
       return;
     }
     const source = this.audioContext.createBufferSource();
@@ -228,7 +228,6 @@ export class GrooveboxComponent implements OnDestroy {
       return;
     }
     if (note.note === '-') {
-      // TODO: how to handle rest?
       return;
     }
     const source = new BornSlippyPatch(this.audioContext);

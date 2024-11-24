@@ -20,17 +20,3 @@ export async function loadSamples(context: AudioContext): Promise<Record<string,
   ROMPLER_SAMPLES.forEach(async sound => sampleLoaders[sound.sample] = await fetchAndDecodeAudio(`samples/instruments/${sound.sample}.wav`, context));
   return sampleLoaders;
 }
-
-export function createSourceAndPlay(ctx: AudioContext, audioBuffer: AudioBuffer): AudioBufferSourceNode {
-  const source = ctx.createBufferSource();
-  source.buffer = audioBuffer;
-  source.connect(ctx.destination);
-  source.start(0);
-  return source;
-}
-
-export function stopSource(source: AudioBufferSourceNode) {
-  if (source) {
-    source.stop();
-  }
-}

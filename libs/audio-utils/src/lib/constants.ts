@@ -1,4 +1,4 @@
-import { BornSlippyPatch, SimplePatch } from './patches';
+import { BornSlippyPatch, Patches, SimplePatch } from './patches';
 
 export const LOW_PASS_MIN = 40;
 
@@ -7,20 +7,26 @@ export const NOTES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#'
 export const SEMITONE_RATIO = Math.pow(2, 1 / 12);
 export const BASE_NOTE = 3;
 export const ROMPLER_SAMPLES = [
-  { sample: 'bass_c', key: BASE_NOTE, name: 'Slap Bass' },
-  { sample: 'bass_long_f', key: BASE_NOTE + 5, name: 'Long Bass' },
-  { sample: 'bass_reese', key: BASE_NOTE, name: 'Reese Bass' },
-  { sample: 'lead_inner', key: BASE_NOTE, name: 'Lead Inner' },
-  { sample: 'pad_hit_dmaj', key: BASE_NOTE + 2, name: 'Chord D-maj' },
-  { sample: 'pad_hit_dmaj_tail', key: BASE_NOTE + 2, name: 'Chord D-maj Tail' },
-  { sample: 'piano_c', key: BASE_NOTE, name: 'Piano' },
+  ['bass_c', BASE_NOTE, 'Slap Bass'],
+  ['bass_long_f', BASE_NOTE + 5, 'Long Bass'],
+  ['bass_reese', BASE_NOTE, 'Reese Bass'],
+  ['lead_inner', BASE_NOTE, 'Lead Inner'],
+  ['pad_hit_dmaj', BASE_NOTE + 2, 'Chord D-maj'],
+  ['pad_hit_dmaj_tail', BASE_NOTE + 2, 'Chord D-maj Tail'],
+  ['piano_c', BASE_NOTE, 'Piano'],
 ] as const;
+export const ROMPLER_INDEX_SAMPLE = 0;
+export const ROMPLER_INDEX_KEY = 1;
+export const ROMPLER_INDEX_NAME = 2;
 
 // synth related
 export const PATCHES = [
-  { name: 'Born Slippy', ctor: BornSlippyPatch },
-  { name: 'Simple Triangle', ctor: SimplePatch }
+  ['Born Slippy', BornSlippyPatch],
+  ['Simple Triangle', SimplePatch]
 ] as const;
+export const PATCH_INDEX_NAME = 0;
+export const PATCH_INDEX_FUNCTION = 1;
+export const PatchMap = new Map<string, Patches>(PATCHES);
 
 // drum related
 export const DRUM_SAMPLES = ['djembe_high', 'djembe_low', 'djembe_mid', 'hihat_1', 'hihat_2', 'kick', 'kicksnare', 'perc', 'vox'] as const;

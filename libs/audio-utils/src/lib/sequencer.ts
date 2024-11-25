@@ -1,4 +1,4 @@
-import { DRUM_SAMPLES, PATCHES, ROMPLER_SAMPLES } from './constants';
+import { DRUM_SAMPLES, PATCHES, ROMPLER_SAMPLES, ROMPLER_INDEX_SAMPLE, PATCH_INDEX_NAME } from './constants';
 
 export type GrooveboxTrack = SynthTrack | DrumTrack | SamplerTrack;
 
@@ -13,7 +13,7 @@ export type TrackBase = {
 
 export type SynthTrack = {
   type: 'SYNTH';
-  patch: (typeof PATCHES)[number]['name'];
+  patch: (typeof PATCHES)[number][typeof PATCH_INDEX_NAME];
   sequence: SynthNote[];
 } & TrackBase;
 
@@ -30,7 +30,7 @@ export type DrumTrack = {
 
 export type SamplerTrack = {
   type: 'SAMPLER';
-  sample: (typeof ROMPLER_SAMPLES)[number]['sample'];
+  sample: (typeof ROMPLER_SAMPLES)[number][typeof ROMPLER_INDEX_SAMPLE];
   envelope: {
     attack: number;
     decay: number;
@@ -89,8 +89,8 @@ export function createSamplerTrack(context: AudioContext): SamplerTrack {
     sample: 'piano_c',
     gain: context.createGain(),
     sequence: [
-      { note: 6 }, { note: 1 }, { note: -2 }, { note: 6 }, { note: 1 }, { note: -2 }, { note: 6 }, { note: 1 },
-      { note: 4 }, { note: 1 }, { note: -4 }, { note: 4 }, { note: 1 }, { note: -4 }, { note: 4 }, { note: 1 }
+      // { note: 6 }, { note: 1 }, { note: -2 }, { note: 6 }, { note: 1 }, { note: -2 }, { note: 6 }, { note: 1 },
+      // { note: 4 }, { note: 1 }, { note: -4 }, { note: 4 }, { note: 1 }, { note: -4 }, { note: 4 }, { note: 1 }
     ]
   }
 }

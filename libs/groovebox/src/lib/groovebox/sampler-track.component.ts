@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, input } from '@angular/co
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { SynthNoteComponent } from './synth-note.component';
-import { ROMPLER_SAMPLES, SamplerTrack, SynthNote, TrackBase } from '@drum-n-js/audio-utils';
+import { ROMPLER_INDEX_NAME, ROMPLER_INDEX_SAMPLE, ROMPLER_SAMPLES, SamplerTrack, SynthNote, TrackBase } from '@drum-n-js/audio-utils';
 import { AudioLines, LucideAngularModule } from 'lucide-angular';
 
 @Component({
@@ -22,7 +22,7 @@ import { AudioLines, LucideAngularModule } from 'lucide-angular';
       <select
         [(ngModel)]="samplerTrack.sample"
         class="bg-slate-500 border border-fd-foreground/10 text-white text-sm rounded focus:ring-blue-500 focus:border-blue-500 block p-1 w-48">
-        <option *ngFor="let sound of SAMPLES" [value]="sound.sample">{{ sound.name }}</option>
+        <option *ngFor="let sound of SAMPLES" [value]="sound[ROMPLER_INDEX_SAMPLE]">{{ sound[ROMPLER_INDEX_NAME] }}</option>
       </select>
       <label class="mr-4 text-slate-500" for="volume">Volume</label>
       <input class="w-32" type="range" min="0" max="1" step="0.01" [(ngModel)]="samplerTrack.volume" />
@@ -80,6 +80,8 @@ export class SamplerTrackComponent {
   track = input.required<TrackBase>();
   samplerTrack = computed(() => this.track() as SamplerTrack);
   SAMPLES = ROMPLER_SAMPLES;
+  ROMPLER_INDEX_SAMPLE = ROMPLER_INDEX_SAMPLE;
+  ROMPLER_INDEX_NAME = ROMPLER_INDEX_NAME;
 
   setNote = (index: number, note: SynthNote) => {
     this.samplerTrack().sequence[index] = note;

@@ -8,16 +8,18 @@ import {
   createSynthTrack, createSamplerTrack, SynthTrack,
   BornSlippyPatch,
   startEnvelope,
-  endEnvelope
+  endEnvelope,
+  PatchMap,
+  Patches,
 } from '@drum-n-js/audio-utils';
 import { LucideAngularModule, AudioWaveform, Drum, AudioLines, Play, Square, TriangleRight, Gauge } from 'lucide-angular';
 
 // TODO:
+// -- Add more samples
+// -- Improve UI
+// -- Add more patches
 // -- Handle track reverberation
 // -- Add master cutoff
-// -- Add more patches
-// -- Add more samples
-// -- Improve performance
 
 @Component({
   selector: 'lib-groovebox',
@@ -78,7 +80,7 @@ export class GrooveboxComponent implements OnDestroy {
   // state
   audioContext!: AudioContext | undefined;
   master!: GainNode;
-  buffers!: Record<string, AudioBuffer>;
+  buffers!: Map<string, [AudioBuffer, number]>;
   isPlaying = false;
   sequencer!: WritableSignal<Sequencer>;
   // consts
@@ -154,7 +156,9 @@ export class GrooveboxComponent implements OnDestroy {
   }
 
   playPatternStep(playTime: number) {
-    this.sequencer().tracks.forEach((track, _, tracks) => {
+    const tracks = this.sequencer().tracks;
+    for (let i = 0; i < tracks.length; i++) {
+      const track = tracks[i];
       if (track.mute) {
         this.muteTrack(track);
         return;
@@ -171,7 +175,7 @@ export class GrooveboxComponent implements OnDestroy {
       } else if (track.type === 'DRUM' && track.sequence[this.currentStep]) {
         this.playSample(playTime, track);
       }
-    });
+    }
   }
 
   private muteTrack(track: GrooveboxTrack) {
@@ -191,7 +195,7 @@ export class GrooveboxComponent implements OnDestroy {
       return;
     }
     const source = this.audioContext.createBufferSource();
-    source.buffer = this.buffers[track.sample];
+    source.buffer = this.buffers.get(track.sample)?.[0] || null;
     source.connect(track.gain);
     track.gain.connect(this.master);
     source.start(when || 0);
@@ -206,8 +210,10 @@ export class GrooveboxComponent implements OnDestroy {
       return;
     }
     const source = this.audioContext.createBufferSource();
-    source.buffer = this.buffers[track.sample];
-    source.detune.value = (note.note - 3) * 100;
+    const [buffer, offset] = this.buffers.get(track.sample) || [null, 0];
+    source.buffer = buffer;
+    // pitch by offset
+    source.detune.value = (note.note - offset) * 100;
     const envelope = this.audioContext.createGain();
     envelope.gain.value = 0;
     source.connect(envelope);
@@ -230,7 +236,8 @@ export class GrooveboxComponent implements OnDestroy {
     if (note.note === '-') {
       return;
     }
-    const source = new BornSlippyPatch(this.audioContext);
+    const Patch: Patches = PatchMap.get(track.patch) || BornSlippyPatch;
+    const source = new Patch(this.audioContext);
     source.connect(track.gain);
     source.frequency = note.frequency || 440;
     track.gain.connect(this.master);
@@ -277,6 +284,7 @@ export class GrooveboxComponent implements OnDestroy {
   clearTrack(id: string) {
     const index = this.sequencer().tracks.findIndex(track => track.id === id);
     if (index !== -1) {
+      // intentional slow operation that creates immutable state
       this.sequencer().tracks[index] = {
         ...this.sequencer().tracks[index],
         sequence: []

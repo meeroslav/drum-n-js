@@ -1,8 +1,7 @@
 import { ChangeDetectionStrategy, Component, input, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { DrumTrack, TrackBase } from '../../../../audio-utils/src/lib/sequencer';
-import { DRUM_SAMPLES } from '@drum-n-js/audio-utils';
+import { DRUM_SAMPLES, DrumTrack, TrackBase } from '@drum-n-js/audio-utils';
 import { LucideAngularModule, Drum } from 'lucide-angular';
 
 @Component({

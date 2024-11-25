@@ -12,6 +12,8 @@ export function endEnvelope(envelopeNode: GainNode, release: number, when?: numb
   envelopeNode.gain.linearRampToValueAtTime(0, endTime + release);
 }
 
+export type Patches = typeof SimplePatch | typeof BornSlippyPatch;
+
 // Most basic audio patch
 export class SimplePatch {
   private _frequency = 0;

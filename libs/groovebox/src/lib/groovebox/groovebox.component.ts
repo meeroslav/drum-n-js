@@ -158,11 +158,11 @@ export class GrooveboxComponent implements OnDestroy {
       const track = tracks[i];
       if (track.mute) {
         this.muteTrack(track);
-        return;
+        continue;
       }
       if (!track.solo && tracks.some(t => t.solo)) {
         this.muteTrack(track);
-        return;
+        continue;
       }
       this.setTrackVolume(track);
       if (track.type === 'SYNTH') {

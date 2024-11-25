@@ -19,7 +19,7 @@ export const ROMPLER_SAMPLES = [
   ['choir_c', BASE_NOTE, 'Choir'],
   ['efx_game', BASE_NOTE, 'Game Efx'],
   ['funk_pad_c', BASE_NOTE, 'Funk Pad'],
-  ['grider_fsharp', BASE_NOTE + 6, 'Grooverider Grawl'],
+  ['grider_fsharp', BASE_NOTE - 6, 'Grooverider Grawl'],
   ['lead_inner', BASE_NOTE, 'Inner Lead'],
   ['organ_d', BASE_NOTE, 'Organ'],
   ['piano_c', BASE_NOTE, 'Piano'],

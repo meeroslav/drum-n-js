@@ -30,25 +30,25 @@ import { AudioLines, LucideAngularModule } from 'lucide-angular';
     <div class="flex items-center space-x-2 mb-1">
       <label for="attact">Attack</label>
       <input
-          class="mr-2"
+          class="mr-2 w-20"
           id="attack"
           [(ngModel)]="samplerTrack.envelope.attack"
           type="range" min="0" max="2" step="0.01" />
       <label for="decay">Decay</label>
       <input
-          class="mr-2"
+          class="mr-2 w-20"
           id="decay"
           [(ngModel)]="samplerTrack.envelope.decay"
           type="range" min="0" max="2" step="0.01" />
       <label for="sustain">Sustain</label>
       <input
-            class="mr-2"
+            class="mr-2 w-20"
             id="sustain"
             [(ngModel)]="samplerTrack.envelope.sustain"
             type="range" min="0" max="1" step="0.01" />
       <label for="release">Release</label>
       <input
-            class="mr-2"
+            class="mr-2 w-20"
             id="release"
             [(ngModel)]="samplerTrack.envelope.release"
             type="range" min="0" max="2" step="0.01" />

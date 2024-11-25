@@ -15,8 +15,6 @@ import {
 import { LucideAngularModule, AudioWaveform, Drum, AudioLines, Play, Square, TriangleRight, Gauge } from 'lucide-angular';
 
 // TODO:
-// -- Add more samples
-// -- Improve UI
 // -- Add more patches
 // -- Handle track reverberation
 // -- Add master cutoff
@@ -46,22 +44,23 @@ import { LucideAngularModule, AudioWaveform, Drum, AudioLines, Play, Square, Tri
       <input class="w-32" type="range" min="0" max="1" step="0.01" [ngModel]="sequencer().volume" (ngModelChange)="updateMasterVolume($event)" />
       <canvas class="rounded" #canvas width="100" height="32"></canvas>
     </div>
-    @if (noContextError) {
+    @if (noContextError()) {
       <h1 class="text-red-500 text-4xl rounded bg-slate-200">Web Audio API is not supported in this browser</h1>
-    } @else if (loadingSamplesWarning) {
+    } @else if (loadingSamplesWarning()) {
       <h1 class="text-yellow-500 text-4xl rounded bg-slate-200">Loading drum samples...</h1>
+    } @else {
+      <div class="flex items-center space-x-2 mt-4">
+        <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-4 rounded" (click)="addSynthTrack()">
+          <i-lucide [img]="AudioWaveformIcon" class="inline-block w-4 h-4 -mt-1 mr-1"></i-lucide>
+          Add Synth Track</button>
+        <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-4 rounded" (click)="addSamplerTrack()">
+          <i-lucide [img]="AudioLinesIcon" class="inline-block w-4 h-4 -mt-1 mr-1"></i-lucide>
+          Add Sampler Track</button>
+        <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-4 rounded" (click)="addDrumTrack()">
+          <i-lucide [img]="DrumIcon" class="inline-block w-4 h-4 -mt-1 mr-1"></i-lucide>
+          Add Drum Track</button>
+      </div>
     }
-    <div class="flex items-center space-x-2 mt-4">
-      <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-4 rounded" (click)="addSynthTrack()">
-        <i-lucide [img]="AudioWaveformIcon" class="inline-block w-4 h-4 -mt-1 mr-1"></i-lucide>
-        Add Synth Track</button>
-      <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-4 rounded" (click)="addSamplerTrack()">
-        <i-lucide [img]="AudioLinesIcon" class="inline-block w-4 h-4 -mt-1 mr-1"></i-lucide>
-        Add Sampler Track</button>
-      <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-4 rounded" (click)="addDrumTrack()">
-        <i-lucide [img]="DrumIcon" class="inline-block w-4 h-4 -mt-1 mr-1"></i-lucide>
-        Add Drum Track</button>
-    </div>
     <div class="mt-4 grid grid-cols-1 gap-2">
       @for (track of sequencer().tracks; track track.id) {
         <sequencer-track [track]="track" (deleteTrack)="deleteTrack($event)" (clearTrack)="clearTrack($event)"></sequencer-track>
@@ -86,8 +85,8 @@ export class GrooveboxComponent implements OnDestroy {
   // consts
   DEFAULT_TEMPO = 125;
   // errors
-  noContextError = false;
-  loadingSamplesWarning = true;
+  noContextError = signal(true);
+  loadingSamplesWarning = signal(true);
   // note scheduling
   clock!: number;
   noteTime!: number;
@@ -105,17 +104,15 @@ export class GrooveboxComponent implements OnDestroy {
     this.calculateTic();
     this.audioContext = createAudioContext();
     if (this.audioContext) {
-      this.noContextError = false;
+      this.noContextError.set(false);
       loadSamples(this.audioContext).then(buffers => {
-        this.loadingSamplesWarning = false;
+        this.loadingSamplesWarning.set(false);
         this.buffers = buffers;
       });
       // set master gain
       this.master = this.audioContext.createGain();
       this.master.gain.value = this.sequencer().volume;
       this.master.connect(this.audioContext.destination);
-    } else {
-      this.noContextError = true;
     }
   }
 

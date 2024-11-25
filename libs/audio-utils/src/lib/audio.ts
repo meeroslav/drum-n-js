@@ -26,5 +26,6 @@ export async function loadSamples(context: AudioContext): Promise<Map<string, [A
     const buffer = await fetchAndDecodeAudio(`samples/instruments/${sample}.wav`, context);
     sampleLoaders.set(sample, [buffer, offset]);
   }
+  console.log('loaded all');
   return sampleLoaders;
 }

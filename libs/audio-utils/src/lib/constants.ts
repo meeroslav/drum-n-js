@@ -7,16 +7,16 @@ export const BASE_NOTE = 3;
 export const NOTES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'] as const;
 export const SEMITONE_RATIO = Math.pow(2, 1 / 12);
 export const ROMPLER_SAMPLES = [
-  ['303_1_g', BASE_NOTE + 7, '303 Open'],
-  ['303_2_g', BASE_NOTE + 7, '303 Closed'],
+  ['303_1_g', BASE_NOTE - 5, '303 Open'],
+  ['303_2_g', BASE_NOTE - 5, '303 Closed'],
   ['bass_a', 0, 'Bass'],
-  ['bass_chonk_c', BASE_NOTE, 'Bass Chonk'],
-  ['bass_growl_c', BASE_NOTE, 'Bass Growl'],
-  ['bass_long_f', BASE_NOTE + 5, 'Bass Long'],
+  ['bass_chonk_c', BASE_NOTE - 12, 'Bass Chonk'],
+  ['bass_growl_c', BASE_NOTE - 12, 'Bass Growl'],
+  ['bass_long_f', BASE_NOTE - 7, 'Bass Long'],
   ['bass_reese', BASE_NOTE, 'Reese Bass'],
-  ['pluck_bass_c', BASE_NOTE, 'Pluck Bass'],
+  ['pluck_bass_c', BASE_NOTE - 12, 'Pluck Bass'],
   ['chase_synth_c', BASE_NOTE, 'Chase Synth'],
-  ['choir_c', BASE_NOTE, 'Choir'],
+  ['choir_c', BASE_NOTE - 12, 'Choir'],
   ['efx_game', BASE_NOTE, 'Game Efx'],
   ['funk_pad_c', BASE_NOTE, 'Funk Pad'],
   ['grider_fsharp', BASE_NOTE - 6, 'Grooverider Grawl'],

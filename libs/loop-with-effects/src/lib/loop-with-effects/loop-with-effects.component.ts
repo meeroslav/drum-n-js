@@ -13,7 +13,7 @@ import { FormsModule } from '@angular/forms';
         {{ isPlaying ? 'Stop' : 'Play' }}
     </button>
     <h3 class="text-xl font-bold mt-4 mb-2">Low Pass Filter</h3>
-    <div class="flex flex-row border rounded p-2">
+    <div class="flex flex-row border rounded border-fd-foreground/10 border-opacity-20 p-2">
       <div class="basis-1/4 ml-2">
         <label for="lowPassFrequency">Cut off Frequency</label>
         <input
@@ -30,7 +30,7 @@ import { FormsModule } from '@angular/forms';
       </div>
     </div>
     <h3 class="text-xl font-bold mt-4 mb-2">Volume</h3>
-    <div class="flex flex-row border rounded p-2">
+    <div class="flex flex-row border rounded border-fd-foreground/10 border-opacity-20 p-2">
       <div class="basis-1/4 ml-2">
         <label for="masterGain">Volume</label>
         <input class="w-full"
@@ -55,7 +55,7 @@ export class LoopWithEffectsComponent implements OnDestroy {
   masterGain = 0.8;
 
   constructor() {
-    const AudioContext = getAudioContext();
+    const AudioContext = globalThis.window?.AudioContext || (globalThis.window as any)?.webkitAudioContext;
     if (AudioContext) {
       this.ctx = new AudioContext();
       // create nodes
@@ -122,8 +122,4 @@ async function fetchAndDecodeAudio(url: string, context: AudioContext): Promise<
   const response = await fetch(url);
   const arrayBuffer = await response.arrayBuffer();
   return await context.decodeAudioData(arrayBuffer);
-}
-
-function getAudioContext() {
-  return globalThis.window?.AudioContext || (globalThis.window as any)?.webkitAudioContext;
 }

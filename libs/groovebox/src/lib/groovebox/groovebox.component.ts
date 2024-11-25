@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, signal, WritableSignal, OnDestroy } from '@angular/core';
+import { ChangeDetectionStrategy, Component, signal, WritableSignal, OnDestroy, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { SequencerTrackComponent } from './track.component';
@@ -12,12 +12,11 @@ import {
   PatchMap,
   Patches,
 } from '@drum-n-js/audio-utils';
-import { LucideAngularModule, AudioWaveform, Drum, AudioLines, Play, Square, TriangleRight, Gauge } from 'lucide-angular';
+import { LucideAngularModule, AudioWaveform, Drum, AudioLines, Play, Square, TriangleRight, Gauge, Activity, ArrowLeftToLine } from 'lucide-angular';
 
 // TODO:
 // -- Add more patches
 // -- Handle track reverberation
-// -- Add master cutoff
 
 @Component({
   selector: 'lib-groovebox',
@@ -39,10 +38,32 @@ import { LucideAngularModule, AudioWaveform, Drum, AudioLines, Play, Square, Tri
       <i-lucide [img]="GaugeIcon" class="inline-block w-4 h-4 -mt-1 mr-1 ml-1"></i-lucide>
       <label class="mr-4 text-slate-500" for="tempo">BPM</label>
       <input class="w-16 rounded bg-slate-500 p-1" type="number" [ngModel]="sequencer().tempo" (ngModelChange)="updateTempo($event)" />
-      <i-lucide [img]="VolumeIcon" class="inline-block w-4 h-4 -mt-1 mr-1 ml-1"></i-lucide>
-      <label class="mr-4 text-slate-500" for="volume">Volume</label>
-      <input class="w-32" type="range" min="0" max="1" step="0.01" [ngModel]="sequencer().volume" (ngModelChange)="updateMasterVolume($event)" />
       <canvas class="rounded" #canvas width="100" height="32"></canvas>
+    </div>
+    <div class="flex flex-row border rounded border-fd-foreground/10 border-opacity-20 mt-2 p-2">
+      <div class="basis-1/5 ml-2">
+        <i-lucide [img]="VolumeIcon" class="inline-block w-4 h-4 -mt-1 mr-2"></i-lucide>
+        <label for="volume">Volume</label>
+        <input type="range" class="w-full" min="0" max="1" step="0.01"
+          [ngModel]="sequencer().volume"
+          (ngModelChange)="updateMasterVolume($event)" />
+      </div>
+      <div class="basis-1/5 ml-2">
+        <i-lucide [img]="ArrowLeftToLine" class="inline-block w-4 h-4 -mt-1 mr-2"></i-lucide>
+        <label for="lowPassFrequency">Cut off</label>
+        <input class="w-full"
+          [ngModel]="lowPassFrequency"
+          (ngModelChange)="setLowPassFrequency($event)"
+          type="range" min="40" [max]="LOW_PASS_MAX" />
+      </div>
+      <div class="basis-1/5 ml-2">
+        <i-lucide [img]="Activity" class="inline-block w-4 h-4 -mt-1 mr-2"></i-lucide>
+        <label for="lowPassQuality">Resonance</label>
+        <input class="w-full"
+          [ngModel]="lowPassQuality"
+          (ngModelChange)="setLowPassQuality($event)"
+          type="range" min="0.0001" max="20" step="0.0001" />
+      </div>
     </div>
     @if (noContextError()) {
       <h1 class="text-red-500 text-4xl rounded bg-slate-200">Web Audio API is not supported in this browser</h1>
@@ -69,6 +90,8 @@ import { LucideAngularModule, AudioWaveform, Drum, AudioLines, Play, Square, Tri
   `
 })
 export class GrooveboxComponent implements OnDestroy {
+  @ViewChild('canvas') canvas!: ElementRef;
+  // icons
   readonly AudioWaveformIcon = AudioWaveform;
   readonly DrumIcon = Drum;
   readonly AudioLinesIcon = AudioLines;
@@ -76,14 +99,21 @@ export class GrooveboxComponent implements OnDestroy {
   readonly StopIcon = Square;
   readonly VolumeIcon = TriangleRight;
   readonly GaugeIcon = Gauge;
+  readonly ArrowLeftToLine = ArrowLeftToLine;
+  readonly Activity = Activity;
   // state
   audioContext!: AudioContext | undefined;
   master!: GainNode;
+  lowPassFilter!: BiquadFilterNode;
+  analyzer!: AnalyserNode;
   buffers!: Map<string, [AudioBuffer, number]>;
   isPlaying = false;
   sequencer!: WritableSignal<Sequencer>;
+  lowPassFrequency = 2000;
+  lowPassQuality = 1;
   // consts
   DEFAULT_TEMPO = 125;
+  LOW_PASS_MAX = 20000;
   // errors
   noContextError = signal(true);
   loadingSamplesWarning = signal(true);
@@ -92,6 +122,8 @@ export class GrooveboxComponent implements OnDestroy {
   noteTime!: number;
   startTime!: number;
   currentStep!: number;
+  // analyzer
+  drawHandle!: number;
   // computed values
   tic!: number;
 
@@ -112,12 +144,29 @@ export class GrooveboxComponent implements OnDestroy {
       // set master gain
       this.master = this.audioContext.createGain();
       this.master.gain.value = this.sequencer().volume;
-      this.master.connect(this.audioContext.destination);
+      // set low pass filter
+      this.lowPassFilter = this.audioContext.createBiquadFilter();
+      this.lowPassFilter.type = 'lowpass';
+      this.LOW_PASS_MAX = this.audioContext.sampleRate / 2;
+      this.lowPassFrequency = this.LOW_PASS_MAX;
+      this.lowPassFilter.frequency.value = this.lowPassFrequency;
+      this.lowPassFilter.Q.value = this.lowPassQuality;
+      // set analyzer
+      this.analyzer = this.audioContext.createAnalyser();
+      this.analyzer.fftSize = 32;
+      this.analyzer.maxDecibels = -10;
+      // connect nodes
+      this.master.connect(this.lowPassFilter);
+      this.lowPassFilter.connect(this.analyzer);
+      this.analyzer.connect(this.audioContext.destination);
     }
   }
 
   ngOnDestroy() {
     clearTimeout(this.clock);
+    if (this.drawHandle) {
+      cancelAnimationFrame(this.drawHandle);
+    }
   }
 
   togglePlay() {
@@ -127,8 +176,12 @@ export class GrooveboxComponent implements OnDestroy {
       this.startTime = this.audioContext.currentTime + 0.005;
       this.currentStep = 0;
       this.scheduleNotes();
+      this.drawVisualizer();
     } else {
       clearTimeout(this.clock);
+      if (this.drawHandle) {
+        cancelAnimationFrame(this.drawHandle);
+      }
     }
   }
 
@@ -297,6 +350,48 @@ export class GrooveboxComponent implements OnDestroy {
   updateTempo(tempo: number) {
     this.sequencer().tempo = tempo;
     this.calculateTic();
+  }
+
+  setLowPassFrequency(frequency: number) {
+    this.lowPassFilter.frequency.value = frequency;
+  }
+
+  setLowPassQuality(quality: number) {
+    this.lowPassFilter.Q.value = quality;
+  }
+
+  drawVisualizer() {
+    const canvas = this.canvas.nativeElement;
+    const canvasCtx = canvas.getContext('2d');
+    const bufferLength = this.analyzer.frequencyBinCount;
+    const dataArray = new Uint8Array(bufferLength);
+    canvasCtx.clearRect(0, 0, canvas.width, canvas.height);
+
+    const draw = () => {
+      this.drawHandle = requestAnimationFrame(draw);
+
+      // clean canvas
+      canvasCtx.fillStyle = "rgb(8, 10, 18)";
+      canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
+
+      canvasCtx.lineWidth = 2;
+      canvasCtx.strokeStyle = "rgb(0, 0, 0)";
+      const barWidth = (canvas.width / bufferLength);
+      let barHeight;
+      let x = 0;
+      // get data
+      this.analyzer.getByteFrequencyData(dataArray);
+      for (let i = 0; i < bufferLength; i++) {
+        barHeight = dataArray[i] / 4;
+
+        canvasCtx.fillStyle = `rgb(30 46 ${barHeight * 4})`;
+        canvasCtx.fillRect(x, canvas.height - barHeight / 1.5, barWidth, barHeight);
+
+        x += barWidth + 1;
+      }
+    };
+
+    draw();
   }
 
   private calculateTic() {

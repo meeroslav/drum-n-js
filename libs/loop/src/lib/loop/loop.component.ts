@@ -20,7 +20,7 @@ export class LoopComponent implements OnDestroy {
   isPlaying = false;
 
   constructor() {
-    const AudioContext = getAudioContext();
+    const AudioContext = globalThis.window?.AudioContext || (globalThis.window as any)?.webkitAudioContext;
     if (AudioContext) {
       this.ctx = new AudioContext();
       fetchAndDecodeAudio('loop.wav', this.ctx).then(audioBuffer => {
@@ -33,19 +33,6 @@ export class LoopComponent implements OnDestroy {
     this.stopSource();
   }
 
-  createSourceAndPlay() {
-    this.source = this.ctx.createBufferSource();
-    this.source.buffer = this.audioBuffer;
-    this.source.connect(this.ctx.destination);
-    this.source.start(0);
-  }
-
-  stopSource() {
-    if (this.source) {
-      this.source.stop();
-    }
-  }
-
   togglePlay() {
     this.isPlaying = !this.isPlaying;
     if (this.isPlaying) {
@@ -54,14 +41,25 @@ export class LoopComponent implements OnDestroy {
       this.stopSource();
     }
   }
+
+  createSourceAndPlay() {
+    if (this.audioBuffer) {
+      this.source = this.ctx.createBufferSource();
+      this.source.buffer = this.audioBuffer;
+      this.source.connect(this.ctx.destination);
+      this.source.start(0);
+    }
+  }
+
+  stopSource() {
+    if (this.source) {
+      this.source.stop();
+    }
+  }
 }
 
 async function fetchAndDecodeAudio(url: string, context: AudioContext): Promise<AudioBuffer> {
   const response = await fetch(url);
   const arrayBuffer = await response.arrayBuffer();
   return await context.decodeAudioData(arrayBuffer);
-}
-
-function getAudioContext() {
-  return globalThis.window?.AudioContext || (globalThis.window as any)?.webkitAudioContext;
 }

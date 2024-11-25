@@ -78,20 +78,20 @@ export class LoopWithVisualizerComponent implements OnDestroy {
 
       // clean canvas
       canvasCtx.fillStyle = "rgb(8, 10, 18)";
-      canvasCtx.fillRect(0, 0, 800, 200);
+      canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
 
       canvasCtx.lineWidth = 2;
       canvasCtx.strokeStyle = "rgb(0, 0, 0)";
-      const barWidth = (800 / bufferLength);
+      const barWidth = (canvas.width / bufferLength);
       let barHeight;
       let x = 0;
       // get data
       this.analyzer.getByteFrequencyData(dataArray);
       for (let i = 0; i < bufferLength; i++) {
-        barHeight = dataArray[i];
+        barHeight = dataArray[i] / 2;
 
-        canvasCtx.fillStyle = `rgb(30 46 ${barHeight})`;
-        canvasCtx.fillRect(800 - x, 200 - barHeight / 1.5, barWidth, barHeight);
+        canvasCtx.fillStyle = `rgb(30 46 ${barHeight * 4})`;
+        canvasCtx.fillRect(x, canvas.height - barHeight / 1.5, barWidth, barHeight);
 
         x += barWidth + 1;
       }

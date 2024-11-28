@@ -9,7 +9,7 @@ import {
   BornSlippyPatch,
   startEnvelope,
   endEnvelope,
-  PatchMap,
+  PATCHES,
   Patches,
 } from '@drum-n-js/audio-utils';
 import { LucideAngularModule, AudioWaveform, Drum, AudioLines, Play, Square, TriangleRight, Gauge, Activity, ArrowLeftToLine } from 'lucide-angular';
@@ -106,7 +106,7 @@ export class GrooveboxComponent implements OnDestroy {
   master!: GainNode;
   lowPassFilter!: BiquadFilterNode;
   analyzer!: AnalyserNode;
-  buffers!: Map<string, [AudioBuffer, number]>;
+  buffers!: Map<string, { buffer: AudioBuffer, offset: number }>;
   isPlaying = false;
   sequencer!: WritableSignal<Sequencer>;
   lowPassFrequency = 2000;
@@ -245,7 +245,7 @@ export class GrooveboxComponent implements OnDestroy {
       return;
     }
     const source = this.audioContext.createBufferSource();
-    source.buffer = this.buffers.get(track.sample)?.[0] || null;
+    source.buffer = this.buffers.get(track.sample)?.buffer || null;
     source.connect(track.gain);
     track.gain.connect(this.master);
     source.start(when || 0);
@@ -260,7 +260,7 @@ export class GrooveboxComponent implements OnDestroy {
       return;
     }
     const source = this.audioContext.createBufferSource();
-    const [buffer, offset] = this.buffers.get(track.sample) || [null, 0];
+    const { buffer, offset } = this.buffers.get(track.sample) || { buffer: null, offset: 0 };
     source.buffer = buffer;
     // pitch by offset
     source.detune.value = (note.note - offset) * 100;
@@ -286,7 +286,7 @@ export class GrooveboxComponent implements OnDestroy {
     if (note.note === '-') {
       return;
     }
-    const Patch: Patches = PatchMap.get(track.patch) || BornSlippyPatch;
+    const Patch: Patches = PATCHES.get(track.patch) || BornSlippyPatch;
     const source = new Patch(this.audioContext);
     source.connect(track.gain);
     source.frequency = note.frequency || 440;

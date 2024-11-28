@@ -6,40 +6,35 @@ export const BASE_NOTE = 3;
 // note related
 export const NOTES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'] as const;
 export const SEMITONE_RATIO = Math.pow(2, 1 / 12);
-export const ROMPLER_SAMPLES = [
-  ['303_1_g', BASE_NOTE - 5, '303 Open'],
-  ['303_2_g', BASE_NOTE - 5, '303 Closed'],
-  ['bass_a', 0, 'Bass'],
-  ['bass_chonk_c', BASE_NOTE - 12, 'Bass Chonk'],
-  ['bass_growl_c', BASE_NOTE - 12, 'Bass Growl'],
-  ['bass_long_f', BASE_NOTE - 7, 'Bass Long'],
-  ['bass_reese', BASE_NOTE, 'Reese Bass'],
-  ['pluck_bass_c', BASE_NOTE - 12, 'Pluck Bass'],
-  ['chase_synth_c', BASE_NOTE, 'Chase Synth'],
-  ['choir_c', BASE_NOTE - 12, 'Choir'],
-  ['efx_game', BASE_NOTE, 'Game Efx'],
-  ['funk_pad_c', BASE_NOTE, 'Funk Pad'],
-  ['grider_fsharp', BASE_NOTE - 6, 'Grooverider Grawl'],
-  ['lead_inner', BASE_NOTE, 'Inner Lead'],
-  ['organ_d', BASE_NOTE, 'Organ'],
-  ['piano_c', BASE_NOTE, 'Piano'],
-  ['tashepad_c', BASE_NOTE, 'Tasche Pad'],
-] as const;
+export const ROMPLER_SAMPLES = {
+  '303_1_g': { offset: BASE_NOTE - 5, name: '303 Open' },
+  '303_2_g': { offset: BASE_NOTE - 5, name: '303 Closed' },
+  'bass_a': { offset: 0, name: 'Bass' },
+  'bass_chonk_c': { offset: BASE_NOTE - 12, name: 'Bass Chonk' },
+  'bass_growl_c': { offset: BASE_NOTE - 12, name: 'Bass Growl' },
+  'bass_long_f': { offset: BASE_NOTE - 7, name: 'Bass Long' },
+  'bass_reese': { offset: BASE_NOTE, name: 'Reese Bass' },
+  'pluck_bass_c': { offset: BASE_NOTE - 12, name: 'Pluck Bass' },
+  'chase_synth_c': { offset: BASE_NOTE, name: 'Chase Synth' },
+  'choir_c': { offset: BASE_NOTE - 12, name: 'Choir' },
+  'efx_game': { offset: BASE_NOTE, name: 'Game Efx' },
+  'funk_pad_c': { offset: BASE_NOTE, name: 'Funk Pad' },
+  'grider_fsharp': { offset: BASE_NOTE - 6, name: 'Grooverider Grawl' },
+  'lead_inner': { offset: BASE_NOTE, name: 'Inner Lead' },
+  'organ_d': { offset: BASE_NOTE, name: 'Organ' },
+  'piano_c': { offset: BASE_NOTE, name: 'Piano' },
+  'tashepad_c': { offset: BASE_NOTE, name: 'Tasche Pad' },
+};
+export const ROMPLER_NAMES = Array.from(Object.keys(ROMPLER_SAMPLES)) as Array<keyof typeof ROMPLER_SAMPLES>;
 
-export const ROMPLER_INDEX_SAMPLE = 0;
-export const ROMPLER_INDEX_KEY = 1;
-export const ROMPLER_INDEX_NAME = 2;
-
-// synth related
-export const PATCHES = [
+// synths
+export const PATCHES = new Map<string, Patches>([
   ['Born Slippy', BornSlippyPatch],
   ['Simple Triangle', SimplePatch]
-] as const;
-export const PATCH_INDEX_NAME = 0;
-export const PATCH_INDEX_FUNCTION = 1;
-export const PatchMap = new Map<string, Patches>(PATCHES);
+]);
+export const PATCH_NAMES = Array.from(PATCHES.keys());
 
-// drum related
+// drums
 export const DRUM_SAMPLES = [
   'bd_phat',
   'bongo1',

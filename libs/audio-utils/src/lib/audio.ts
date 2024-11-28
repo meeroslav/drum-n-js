@@ -1,4 +1,4 @@
-import { DRUM_SAMPLES, ROMPLER_SAMPLES } from './constants';
+import { DRUM_SAMPLES, ROMPLER_NAMES, ROMPLER_SAMPLES } from './constants';
 
 export function createAudioContext() {
   const AudioContext = globalThis.window?.AudioContext || (globalThis.window as any)?.webkitAudioContext;
@@ -14,18 +14,17 @@ export async function fetchAndDecodeAudio(url: string, context: AudioContext): P
   return await context.decodeAudioData(arrayBuffer);
 }
 
-export async function loadSamples(context: AudioContext): Promise<Map<string, [AudioBuffer, number]>> {
-  const sampleLoaders: Map<string, [AudioBuffer, number]> = new Map();
+export async function loadSamples(context: AudioContext): Promise<Map<string, { buffer: AudioBuffer, offset: number }>> {
+  const sampleLoaders: Map<string, { buffer: AudioBuffer, offset: number }> = new Map();
   for (let i = 0; i < DRUM_SAMPLES.length; i++) {
     const sample = DRUM_SAMPLES[i];
     const buffer = await fetchAndDecodeAudio(`samples/drums/${sample}.wav`, context);
-    sampleLoaders.set(sample, [buffer, 0]);
+    sampleLoaders.set(sample, { buffer, offset: 0 });
   }
-  for (let i = 0; i < ROMPLER_SAMPLES.length; i++) {
-    const [sample, offset] = ROMPLER_SAMPLES[i];
+  for (let i = 0; i < ROMPLER_NAMES.length; i++) {
+    const sample = ROMPLER_NAMES[i];
     const buffer = await fetchAndDecodeAudio(`samples/instruments/${sample}.wav`, context);
-    sampleLoaders.set(sample, [buffer, offset]);
+    sampleLoaders.set(sample, { buffer, offset: ROMPLER_SAMPLES[sample]?.offset || 0 });
   }
-  console.log('loaded all');
   return sampleLoaders;
 }

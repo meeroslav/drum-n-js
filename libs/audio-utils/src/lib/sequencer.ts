@@ -1,4 +1,4 @@
-import { DRUM_SAMPLES, PATCHES, ROMPLER_SAMPLES, ROMPLER_INDEX_SAMPLE, PATCH_INDEX_NAME } from './constants';
+import { DRUM_SAMPLES, PATCH_NAMES, ROMPLER_NAMES } from './constants';
 
 export type GrooveboxTrack = SynthTrack | DrumTrack | SamplerTrack;
 
@@ -13,7 +13,7 @@ export type TrackBase = {
 
 export type SynthTrack = {
   type: 'SYNTH';
-  patch: (typeof PATCHES)[number][typeof PATCH_INDEX_NAME];
+  patch: (typeof PATCH_NAMES)[number];
   sequence: SynthNote[];
 } & TrackBase;
 
@@ -30,7 +30,7 @@ export type DrumTrack = {
 
 export type SamplerTrack = {
   type: 'SAMPLER';
-  sample: (typeof ROMPLER_SAMPLES)[number][typeof ROMPLER_INDEX_SAMPLE];
+  sample: (typeof ROMPLER_NAMES)[number];
   envelope: {
     attack: number;
     decay: number;
